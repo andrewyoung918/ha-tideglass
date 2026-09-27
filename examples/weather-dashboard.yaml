@@ -63,7 +63,7 @@ views:
             name: Tide direction
           - type: tile
             entity: sensor.provincetown_tideglass_predicted_height
-            name: Predicted height now
+            name: Predicted height
           - type: entities
             show_header_toggle: false
             entities:
@@ -121,9 +121,10 @@ views:
           - type: iframe
             url: https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=in&metricTemp=%C2%B0F&metricWind=mph&zoom=8&overlay=radar&product=radar&level=surface&lat=42.05&lon=-70.18&marker=true
             aspect_ratio: 85%
-            title: Current weather radar · Provincetown
+            title: Provincetown radar
             grid_options:
               columns: full
+              rows: 7
       - type: grid
         cards:
           - type: heading
@@ -133,9 +134,10 @@ views:
           - type: iframe
             url: https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=in&metricTemp=%C2%B0F&metricWind=mph&zoom=8&overlay=wind&product=ecmwf&level=surface&lat=42.05&lon=-70.18&marker=true
             aspect_ratio: 85%
-            title: Wind forecast · Provincetown
+            title: Windy wind forecast
             grid_options:
               columns: full
+              rows: 7
       - type: grid
         column_span: 2
         cards:

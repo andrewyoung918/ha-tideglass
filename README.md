@@ -58,7 +58,7 @@ Tide predictions do not account for storm surge or actual water-level observatio
 
 ## Development status
 
-Version `0.1.0` is an initial release for use as a **HACS custom repository**, not yet installed or verified on the live household instance. Add `https://github.com/andrewyoung918/ha-tideglass` to HACS as an Integration. This project is not listed in HACS’s default catalog.
+Version `0.1.0` is an initial release for use as a **HACS custom repository**, installed and verified on Home Assistant 2026.9.3. Add `https://github.com/andrewyoung918/ha-tideglass` to HACS as an Integration. This project is not listed in HACS’s default catalog. See [verification notes](docs/VERIFICATION.md) for the live checks and remaining limits.
 
 Source: `/Users/andrew/Development/ha-tideglass`. Andrew’s live-configuration workflow remains in `/Users/andrew/Development/home-assistant-config`; this is an integration project, not a second house-configuration tree.
 

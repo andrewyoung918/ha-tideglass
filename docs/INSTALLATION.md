@@ -1,6 +1,6 @@
 # Install and verify
 
-Tideglass is distributed as a HACS custom repository. It has not yet been installed or verified on the live household instance.
+Tideglass is distributed as a HACS custom repository. Version 0.1.0 was installed through HACS and verified on Home Assistant 2026.9.3 on September 27, 2026; see `VERIFICATION.md`.
 
 ## HACS distribution
 
