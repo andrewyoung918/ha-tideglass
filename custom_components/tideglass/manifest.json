@@ -1,0 +1,12 @@
+{
+  "domain": "tideglass",
+  "name": "Tideglass",
+  "codeowners": ["@andrewyoung918"],
+  "config_flow": true,
+  "documentation": "https://github.com/andrewyoung918/ha-tideglass",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/andrewyoung918/ha-tideglass/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}

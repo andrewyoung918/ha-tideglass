@@ -1,0 +1,28 @@
+# Optional. Place in the existing themes directory; reload themes, then select Tideglass Coast.
+Tideglass Coast:
+  primary-color: '#65c8b9'
+  accent-color: '#edcc91'
+  ha-card-border-radius: 22px
+  ha-card-border-width: 1px
+  ha-card-box-shadow: none
+  ha-card-header-font-size: 22px
+  masonry-view-card-margin: 12px
+  modes:
+    dark:
+      primary-background-color: '#0b1720'
+      secondary-background-color: '#101f2b'
+      card-background-color: '#101f2b'
+      ha-card-background: '#101f2b'
+      ha-card-border-color: '#263b46'
+      primary-text-color: '#edf5f2'
+      secondary-text-color: '#91abb5'
+      divider-color: '#263b46'
+    light:
+      primary-background-color: '#ebeee7'
+      secondary-background-color: '#f4f5ef'
+      card-background-color: '#f4f5ef'
+      ha-card-background: '#f4f5ef'
+      ha-card-border-color: '#dce4df'
+      primary-text-color: '#163d49'
+      secondary-text-color: '#577580'
+      divider-color: '#dce4df'

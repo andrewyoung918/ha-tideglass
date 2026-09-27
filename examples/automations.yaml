@@ -1,0 +1,37 @@
+# Examples only. Add through your usual automation workflow; neither is installed automatically.
+- alias: Tideglass · Low tide in 30 minutes
+  description: Notify before a predicted low tide using the native calendar trigger.
+  mode: queued
+  max: 4
+  triggers:
+    - trigger: calendar
+      entity_id: calendar.provincetown_tideglass_tides
+      event: start
+      offset: '-00:30:00'
+  conditions:
+    - condition: template
+      value_template: "{{ trigger.calendar_event.summary.startswith('Low tide') }}"
+  actions:
+    - action: persistent_notification.create
+      data:
+        title: Low tide is coming
+        message: "{{ trigger.calendar_event.summary }} in 30 minutes."
+
+- alias: Tideglass · Predicted height above eight feet
+  description: Example threshold on predicted height, excluding recovery from unavailable data.
+  mode: single
+  triggers:
+    - trigger: numeric_state
+      entity_id: sensor.provincetown_tideglass_predicted_height
+      above: 8
+  conditions:
+    - condition: template
+      value_template: >-
+        {{ trigger.from_state is not none
+           and is_number(trigger.from_state.state)
+           and state_attr(trigger.entity_id, 'unit_of_measurement') == 'ft' }}
+  actions:
+    - action: persistent_notification.create
+      data:
+        title: Tide is above eight feet
+        message: Predicted height has crossed 8 ft MLLW at Provincetown.

@@ -1,0 +1,39 @@
+{
+  "title": "Tideglass",
+  "config": {
+    "step": {
+      "user": {
+        "title": "A little closer to the tide",
+        "description": "NOAA tide predictions, starting with Provincetown (8446121). Enter any NOAA tide-prediction station ID. Choose the station\u2019s IANA time zone for graph days and labels.",
+        "data": {
+          "station": "NOAA station ID",
+          "units": "Height unit",
+          "time_zone": "Station time zone"
+        }
+      }
+    },
+    "error": {
+      "invalid_station": "Enter a seven-digit NOAA station ID, or Provincetown.",
+      "invalid_time_zone": "Enter an IANA time zone, such as America/New_York.",
+      "cannot_connect": "Cannot reach NOAA. Try again shortly.",
+      "no_predictions": "NOAA has no usable tide predictions for this station."
+    },
+    "abort": {
+      "already_configured": "This tide station is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Tide display",
+        "data": {
+          "units": "Height unit",
+          "time_zone": "Station time zone"
+        }
+      }
+    },
+    "error": {
+      "invalid_time_zone": "Enter an IANA time zone, such as America/New_York."
+    }
+  }
+}

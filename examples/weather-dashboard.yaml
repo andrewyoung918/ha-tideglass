@@ -1,0 +1,157 @@
+title: Coast
+views:
+  - title: At the water’s edge
+    path: coast
+    icon: mdi:weather-partly-cloudy
+    type: sections
+    max_columns: 2
+    dense_section_placement: false
+    sections:
+      - type: grid
+        column_span: 2
+        cards:
+          - type: markdown
+            content: |
+              # At the water’s edge
+              Provincetown · Weather, wind & the rhythm of the harbor
+            text_only: true
+            grid_options:
+              columns: full
+          - type: weather-forecast
+            entity: weather.kpvc
+            name: Provincetown
+            forecast_type: twice_daily
+            show_current: true
+            show_forecast: true
+            secondary_info_attribute: humidity
+            grid_options:
+              columns: full
+          - type: picture-entity
+            entity: image.provincetown_tideglass_today_dark
+            show_name: false
+            show_state: false
+            tap_action:
+              action: more-info
+            grid_options:
+              columns: full
+      - type: grid
+        cards:
+          - type: heading
+            heading: The next turn
+            heading_style: title
+            icon: mdi:waves
+          - type: tile
+            entity: sensor.provincetown_tideglass_next_low_time
+            name: Next low
+            icon: mdi:arrow-down-bold
+            color: teal
+          - type: tile
+            entity: sensor.provincetown_tideglass_next_low_height
+            name: Low height
+            color: teal
+          - type: tile
+            entity: sensor.provincetown_tideglass_next_high_time
+            name: Next high
+            icon: mdi:arrow-up-bold
+            color: amber
+          - type: tile
+            entity: sensor.provincetown_tideglass_next_high_height
+            name: High height
+            color: amber
+          - type: tile
+            entity: sensor.provincetown_tideglass_tide_direction
+            name: Tide direction
+          - type: tile
+            entity: sensor.provincetown_tideglass_predicted_height
+            name: Predicted height now
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: sensor.provincetown_tideglass_most_recent_tide
+                name: Most recent tide
+              - entity: sensor.provincetown_tideglass_most_recent_tide_time
+                name: At
+            grid_options:
+              columns: full
+          - type: conditional
+            conditions:
+              - entity: sensor.provincetown_tideglass_prediction_status
+                state: cached
+            card:
+              type: markdown
+              content: >-
+                NOAA is temporarily unreachable. Stored predictions are still valid;
+                Tideglass will retry automatically.
+          - type: conditional
+            conditions:
+              - entity: sensor.provincetown_tideglass_next_tide_time
+                state: unavailable
+            card:
+              type: markdown
+              content: Tide predictions are unavailable. Check the Tideglass integration.
+      - type: grid
+        cards:
+          - type: heading
+            heading: The hours ahead
+            heading_style: title
+            icon: mdi:weather-clock
+          - type: weather-forecast
+            entity: weather.kpvc
+            forecast_type: hourly
+            show_current: false
+            show_forecast: true
+            grid_options:
+              columns: full
+          - type: markdown
+            content: |
+              ### Coastal outlook
+              [National Weather Service](https://forecast.weather.gov/MapClick.php?lat=42.05&lon=-70.18)
+              · [NOAA tide table](https://tidesandcurrents.noaa.gov/noaatidepredictions.html?id=8446121)
+
+              Tide heights are predictions relative to mean lower low water (MLLW).
+              Wind and weather can change actual water levels.
+            grid_options:
+              columns: full
+      - type: grid
+        cards:
+          - type: heading
+            heading: Weather radar
+            heading_style: title
+            icon: mdi:radar
+          - type: iframe
+            url: https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=in&metricTemp=%C2%B0F&metricWind=mph&zoom=8&overlay=radar&product=radar&level=surface&lat=42.05&lon=-70.18&marker=true
+            aspect_ratio: 85%
+            title: Current weather radar · Provincetown
+            grid_options:
+              columns: full
+      - type: grid
+        cards:
+          - type: heading
+            heading: Wind over the Cape
+            heading_style: title
+            icon: mdi:weather-windy
+          - type: iframe
+            url: https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=in&metricTemp=%C2%B0F&metricWind=mph&zoom=8&overlay=wind&product=ecmwf&level=surface&lat=42.05&lon=-70.18&marker=true
+            aspect_ratio: 85%
+            title: Wind forecast · Provincetown
+            grid_options:
+              columns: full
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: A week by the water
+            heading_style: title
+            icon: mdi:calendar-week
+          - type: picture-entity
+            entity: image.provincetown_tideglass_week_dark
+            show_name: false
+            show_state: false
+            grid_options:
+              columns: full
+          - type: calendar
+            initial_view: listWeek
+            entities:
+              - calendar.provincetown_tideglass_tides
+            grid_options:
+              columns: full
