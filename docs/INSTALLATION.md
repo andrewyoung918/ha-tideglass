@@ -22,6 +22,8 @@ Settings → Devices & services → Add integration → Tideglass. Defaults: Pro
 
 ## Dashboard
 
+For the navy, seafoam and gold design, follow the [styled dashboard guide](DASHBOARD.md) and use `examples/weather-dashboard-aesthetic.yaml`. The instructions below describe the simpler native-card alternative.
+
 Create a new empty dashboard from Settings → Dashboards. Open its raw configuration editor and use `examples/weather-dashboard.yaml`. The current weather entity `weather.kpvc` was verified in the live entity registry as the existing NWS “Provincetown Weather” entity. That integration supports hourly and twice-daily forecasts; the YAML uses those supported modes.
 
 Verify the newly created Tideglass entity IDs before saving if HA adds suffixes or the device was renamed. The dashboard uses native cards only. Windy’s official embeds provide separate radar and wind maps. The map URLs are centered on public Provincetown coordinates. Radar data availability and map interactions depend on Windy.

@@ -28,6 +28,8 @@ High/low sensors use NOAA’s actual high/low prediction product. Harmonic stati
 
 ## A dashboard for the coast
 
+[`examples/weather-dashboard-aesthetic.yaml`](examples/weather-dashboard-aesthetic.yaml) is the styled Coast dashboard: Tideglass’s navy, seafoam and gold palette, a large current-weather panel, a six-hour outlook, full-width tide curves, explicit high/low times and heights, radar, wind, and a readable seven-day tide table. It uses the HACS **button-card** and **clock-weather-card** frontend cards. Colors stay scoped to the dashboard; no global theme change is needed. See the [styled dashboard guide](docs/DASHBOARD.md).
+
 [`examples/weather-dashboard.yaml`](examples/weather-dashboard.yaml) combines the existing NWS Provincetown weather entity (`weather.kpvc`), supported day/night and hourly forecasts, today’s tide curve, upcoming tide tiles, a Windy radar map, a separate Windy wind map, and a seven-day curve/calendar. Native HA cards only; no frontend custom-card dependency.
 
 [`examples/coast-theme.yaml`](examples/coast-theme.yaml) adds matching light/dark colors and soft card corners. See the [installation and validation instructions](docs/INSTALLATION.md).

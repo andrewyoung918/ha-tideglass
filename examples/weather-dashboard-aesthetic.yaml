@@ -1,0 +1,402 @@
+title: Coast
+button_card_templates:
+  coast_panel:
+    show_icon: false
+    show_name: false
+    show_state: false
+    tap_action:
+      action: none
+    hold_action:
+      action: none
+    styles:
+      card:
+      - background: '#101f2b'
+      - border: '1px solid #283e4a'
+      - border-radius: 24px
+      - box-shadow: 0 8px 32px rgba(0,0,0,0.10)
+      - padding: 24px
+      - color: '#edf5f2'
+      - font-family: var(--primary-font-family)
+      - font-size: 14px
+      - --primary-text-color: '#edf5f2'
+      - --secondary-text-color: '#91abb5'
+      - --primary-color: '#73dbc7'
+      - --accent-color: '#efd19a'
+      - --light-primary-color: '#73dbc7'
+      - --text-light-primary-color: '#0b1720'
+      - --ha-card-background: '#101f2b'
+      - --card-background-color: '#101f2b'
+      - --ha-card-border-width: '0'
+      - --ha-card-box-shadow: none
+      - --ha-card-border-radius: 16px
+      - --divider-color: '#283e4a'
+      - --secondary-background-color: '#19303d'
+      - --paper-item-icon-color: '#73dbc7'
+      - --fc-border-color: '#283e4a'
+      - --fc-list-event-hover-bg-color: '#193c45'
+      - --fc-today-bg-color: '#193c45'
+      - --fc-neutral-bg-color: '#19303d'
+      grid:
+      - grid-template-areas: '"body"'
+      - grid-template-columns: minmax(0, 1fr)
+      - grid-template-rows: min-content
+      custom_fields:
+        body:
+        - white-space: normal
+        - text-align: left
+        - width: 100%
+        - min-width: '0'
+    grid_options:
+      columns: full
+      rows: auto
+    extra_styles: |2
+
+      .eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 2.3px; text-transform: uppercase; color: #73dbc7; line-height: 1.6; }
+      .serif { font-family: Georgia, 'Times New Roman', serif; font-weight: 400; letter-spacing: -.7px; }
+      .muted { color: #91abb5; }
+      .metric { display: flex; align-items: center; gap: 7px; font-size: 13px; color: #b9cdd2; }
+      .metric ha-icon { margin: 0; flex-shrink: 0; width: 16px; height: 16px; color: #73dbc7; }
+views:
+- title: At the water’s edge
+  path: coast
+  icon: mdi:waves
+  type: sections
+  max_columns: 2
+  dense_section_placement: false
+  background:
+    image: data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%228%22%20height%3D%228%22%3E%3Cpath%20fill%3D%22%230b1720%22%20d%3D%22M0%200h8v8H0z%22/%3E%3C/svg%3E
+    opacity: 100
+    size: cover
+    attachment: fixed
+  sections:
+  - type: grid
+    cards:
+    - grid_options:
+        columns: full
+        rows: auto
+      type: custom:button-card
+      template: coast_panel
+      custom_fields:
+        body: <div class="eyebrow">Tideglass / Provincetown</div><div class="serif" style="font-size:clamp(32px,5vw,46px);line-height:1.15;margin-top:9px">At
+          the water’s edge.</div><div class="muted" style="font-size:13px;margin-top:12px;line-height:1.5">Weather,
+          wind &amp; the rhythm of the harbor</div>
+      styles:
+        card:
+        - background: transparent
+        - border: '0'
+        - box-shadow: none
+        - padding: 14px 8px 20px
+    column_span: 2
+  - type: grid
+    cards:
+    - grid_options:
+        columns: full
+        rows: auto
+      type: custom:button-card
+      template: coast_panel
+      custom_fields:
+        body: |-
+          [[[
+          const a = entity?.attributes || {};
+          const ok = entity && !['unavailable','unknown'].includes(entity.state);
+          const number = value => value !== null && value !== undefined && value !== '' && Number.isFinite(Number(value));
+          const temp = ok && number(a.temperature) ? Math.round(Number(a.temperature)) : '—';
+          const unit = a.temperature_unit === '°C' ? '°C' : a.temperature_unit === '°F' ? '°F' : '°';
+          const conditions = {'clear-night':'Clear night','cloudy':'Cloudy','exceptional':'Exceptional weather','fog':'Fog','hail':'Hail','lightning':'Thunderstorms','lightning-rainy':'Thunderstorms','partlycloudy':'Partly cloudy','pouring':'Heavy rain','rainy':'Rain','snowy':'Snow','snowy-rainy':'Wintry mix','sunny':'Sunny','windy':'Windy','windy-variant':'Windy'};
+          const icons = {'clear-night':'weather-night','cloudy':'weather-cloudy','fog':'weather-fog','hail':'weather-hail','lightning':'weather-lightning','lightning-rainy':'weather-lightning-rainy','partlycloudy':'weather-partly-cloudy','pouring':'weather-pouring','rainy':'weather-rainy','snowy':'weather-snowy','snowy-rainy':'weather-snowy-rainy','sunny':'weather-sunny','windy':'weather-windy','windy-variant':'weather-windy-variant'};
+          const condition = ok ? (conditions[entity.state] || 'Weather') : 'Weather unavailable';
+          const windUnit = ['mph','km/h','m/s','kn'].includes(a.wind_speed_unit) ? a.wind_speed_unit : '';
+          const speed = ok && number(a.wind_speed) ? `${Math.round(Number(a.wind_speed))} ${windUnit}` : '—';
+          const bearing = number(a.wind_bearing) ? ['N','NE','E','SE','S','SW','W','NW'][Math.round(Number(a.wind_bearing)/45)%8] : '';
+          const humidity = ok && number(a.humidity) ? `${Math.round(Number(a.humidity))}%` : '—';
+          return `<div class="eyebrow">Right now · Provincetown</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin:15px 0 8px">
+          <div><span class="serif" style="font-size:78px;line-height:1">${temp}</span><span style="font-size:27px;color:#91abb5;vertical-align:top;margin-left:3px">${unit}</span></div>
+          <ha-icon icon="mdi:${icons[entity?.state] || 'weather-cloudy-alert'}" style="margin:0;flex-shrink:0;width:66px;height:66px;color:#efd19a;opacity:.95"></ha-icon></div>
+          <div class="serif" style="font-size:26px">${condition}</div>
+          <div style="display:flex;gap:20px;flex-wrap:wrap;border-top:1px solid #283e4a;padding-top:18px;margin-top:22px">
+          <div class="metric"><ha-icon icon="mdi:weather-windy"></ha-icon>${speed} ${ok ? bearing : ''}</div>
+          <div class="metric"><ha-icon icon="mdi:water-percent"></ha-icon>${humidity} humidity</div></div>
+          <div class="muted" style="font-size:10px;letter-spacing:.7px;margin-top:20px">NATIONAL WEATHER SERVICE · KPVC</div>`;
+          ]]]
+      entity: weather.kpvc
+      tap_action:
+        action: more-info
+  - type: grid
+    cards:
+    - grid_options:
+        columns: full
+        rows: auto
+      type: custom:button-card
+      template: coast_panel
+      custom_fields:
+        heading: <div class="eyebrow">A little further out</div><div class="serif" style="font-size:28px;margin-top:5px">The
+          hours ahead</div>
+        body:
+          card:
+            type: custom:clock-weather-card
+            entity: weather.kpvc
+            sun_entity: sun.sun
+            weather_icon_type: line
+            animated_icon: false
+            forecast_rows: 6
+            locale: en-US
+            time_format: 12
+            time_pattern: h a
+            hide_today_section: true
+            hourly_forecast: true
+            time_zone: America/New_York
+            show_decimal: false
+      styles:
+        card:
+        - padding: 20px
+        grid:
+        - grid-template-areas: '"heading" "body"'
+        - row-gap: 14px
+        custom_fields:
+          heading:
+          - text-align: left
+          - white-space: normal
+  - type: grid
+    cards:
+    - grid_options:
+        columns: full
+        rows: auto
+      type: custom:button-card
+      template: coast_panel
+      custom_fields:
+        body:
+          card:
+            type: picture-entity
+            entity: image.provincetown_tideglass_today_dark
+            show_name: false
+            show_state: false
+            tap_action:
+              action: more-info
+      styles:
+        card:
+        - padding: '0'
+    column_span: 2
+  - type: grid
+    cards:
+    - grid_options:
+        columns: 6
+        rows: auto
+      type: custom:button-card
+      template: coast_panel
+      custom_fields:
+        body: |-
+          [[[
+          const time = entity?.state;
+          const valid = time && !['unknown','unavailable'].includes(time) && !Number.isNaN(Date.parse(time));
+          const d = valid ? new Date(time) : null;
+          const tz = {timeZone:'America/New_York'};
+          const clock = d ? d.toLocaleTimeString('en-US',{...tz,hour:'numeric',minute:'2-digit'}) : 'Unavailable';
+          const day = d ? d.toLocaleDateString('en-US',{...tz,weekday:'short',month:'short',day:'numeric'}) : 'Waiting for NOAA';
+          const h = states['sensor.provincetown_tideglass_next_low_height'];
+          const heightValid = h && h.state !== '' && !['unknown','unavailable'].includes(h.state) && Number.isFinite(Number(h.state));
+          const height = heightValid ? `${Number(h.state).toFixed(2)} ${['ft','m'].includes(h.attributes.unit_of_measurement) ? h.attributes.unit_of_measurement : ''}` : '—';
+          return `<div style="display:flex;justify-content:space-between;align-items:center"><span class="eyebrow" style="color:#73dbc7">Next low</span><ha-icon icon="mdi:arrow-down" style="margin:0;flex-shrink:0;width:21px;height:21px;color:#73dbc7"></ha-icon></div><div class="serif" style="font-size:clamp(26px,4vw,38px);margin-top:19px;white-space:nowrap">${clock}</div><div class="muted" style="font-size:12px;margin-top:5px">${day}</div><div style="margin-top:21px;padding-top:14px;border-top:1px solid #283e4a;color:#73dbc7;font-size:21px">${height}<span class="muted" style="font-size:10px;margin-left:7px">MLLW</span></div>`;
+          ]]]
+      entity: sensor.provincetown_tideglass_next_low_time
+      tap_action:
+        action: more-info
+      triggers_update:
+      - sensor.provincetown_tideglass_next_low_height
+      styles:
+        card:
+        - padding: 20px
+    - grid_options:
+        columns: 6
+        rows: auto
+      type: custom:button-card
+      template: coast_panel
+      custom_fields:
+        body: |-
+          [[[
+          const time = entity?.state;
+          const valid = time && !['unknown','unavailable'].includes(time) && !Number.isNaN(Date.parse(time));
+          const d = valid ? new Date(time) : null;
+          const tz = {timeZone:'America/New_York'};
+          const clock = d ? d.toLocaleTimeString('en-US',{...tz,hour:'numeric',minute:'2-digit'}) : 'Unavailable';
+          const day = d ? d.toLocaleDateString('en-US',{...tz,weekday:'short',month:'short',day:'numeric'}) : 'Waiting for NOAA';
+          const h = states['sensor.provincetown_tideglass_next_high_height'];
+          const heightValid = h && h.state !== '' && !['unknown','unavailable'].includes(h.state) && Number.isFinite(Number(h.state));
+          const height = heightValid ? `${Number(h.state).toFixed(2)} ${['ft','m'].includes(h.attributes.unit_of_measurement) ? h.attributes.unit_of_measurement : ''}` : '—';
+          return `<div style="display:flex;justify-content:space-between;align-items:center"><span class="eyebrow" style="color:#efd19a">Next high</span><ha-icon icon="mdi:arrow-up" style="margin:0;flex-shrink:0;width:21px;height:21px;color:#efd19a"></ha-icon></div><div class="serif" style="font-size:clamp(26px,4vw,38px);margin-top:19px;white-space:nowrap">${clock}</div><div class="muted" style="font-size:12px;margin-top:5px">${day}</div><div style="margin-top:21px;padding-top:14px;border-top:1px solid #283e4a;color:#efd19a;font-size:21px">${height}<span class="muted" style="font-size:10px;margin-left:7px">MLLW</span></div>`;
+          ]]]
+      entity: sensor.provincetown_tideglass_next_high_time
+      tap_action:
+        action: more-info
+      triggers_update:
+      - sensor.provincetown_tideglass_next_high_height
+      styles:
+        card:
+        - padding: 20px
+  - type: grid
+    cards:
+    - grid_options:
+        columns: full
+        rows: auto
+      type: custom:button-card
+      template: coast_panel
+      custom_fields:
+        body: |-
+          [[[
+          const value = suffix => states['sensor.provincetown_tideglass_'+suffix]?.state;
+          const direction = value('tide_direction');
+          const recent = value('most_recent_tide');
+          const recentTime = value('most_recent_tide_time');
+          const when = recentTime && !Number.isNaN(Date.parse(recentTime)) ? new Date(recentTime).toLocaleTimeString('en-US',{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'}) : '—';
+          const status = value('prediction_status');
+          const h = states['sensor.provincetown_tideglass_predicted_height'];
+          const height = h && h.state !== '' && !['unknown','unavailable'].includes(h.state) && Number.isFinite(Number(h.state)) ? `${Number(h.state).toFixed(2)} ${['ft','m'].includes(h.attributes.unit_of_measurement) ? h.attributes.unit_of_measurement : ''}` : 'unavailable';
+          const directionText = direction === 'rising' ? 'The tide is rising' : direction === 'falling' ? 'The tide is falling' : 'Tide direction unavailable';
+          const recentText = recent === 'low' ? 'Low tide' : recent === 'high' ? 'High tide' : 'Last tide unavailable';
+          const note = status === 'fresh' ? 'NOAA predictions · Updated automatically' : status === 'cached' ? 'Using stored NOAA predictions · Retrying connection' : 'Predictions unavailable · Check Tideglass';
+          return `<div style="display:flex;gap:13px;align-items:center"><ha-icon icon="mdi:waves" style="margin:0;flex-shrink:0;width:30px;height:30px;color:#73dbc7"></ha-icon><div><div style="font-size:15px">${directionText}</div><div class="muted" style="font-size:12px;margin-top:5px">${recentText} at ${when}</div><div class="muted" style="font-size:12px;margin-top:5px">Predicted height ${height}</div></div></div><div style="font-size:11px;color:${status==='fresh'?'#91abb5':'#efd19a'};margin-top:16px;line-height:1.5">${note}</div>`;
+          ]]]
+      entity: sensor.provincetown_tideglass_tide_direction
+      tap_action:
+        action: more-info
+      triggers_update:
+      - sensor.provincetown_tideglass_most_recent_tide
+      - sensor.provincetown_tideglass_most_recent_tide_time
+      - sensor.provincetown_tideglass_prediction_status
+      - sensor.provincetown_tideglass_predicted_height
+    - grid_options:
+        columns: full
+        rows: auto
+      type: custom:button-card
+      template: coast_panel
+      custom_fields:
+        body:
+          card:
+            type: markdown
+            content: 'Tide heights are NOAA predictions relative to **mean lower low water (MLLW)**. Wind and weather
+              can change actual water levels.
+
+
+              [National Weather Service](https://forecast.weather.gov/MapClick.php?lat=42.05&lon=-70.18) · [NOAA
+              tide table](https://tidesandcurrents.noaa.gov/noaatidepredictions.html?id=8446121)'
+      styles:
+        card:
+        - padding: 8px
+  - type: grid
+    cards:
+    - grid_options:
+        columns: full
+        rows: auto
+      type: custom:button-card
+      template: coast_panel
+      custom_fields:
+        heading: <div class="eyebrow">Live radar</div><div class="serif" style="font-size:28px;margin-top:5px">Rain
+          on the horizon</div>
+        body:
+          card:
+            type: iframe
+            url: https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=in&metricTemp=%C2%B0F&metricWind=mph&zoom=8&overlay=radar&product=radar&level=surface&lat=42.05&lon=-70.18&marker=true
+            aspect_ratio: 95%
+      styles:
+        card:
+        - padding: 20px 12px 12px
+        grid:
+        - grid-template-areas: '"heading" "body"'
+        - row-gap: 14px
+        custom_fields:
+          heading:
+          - text-align: left
+          - white-space: normal
+  - type: grid
+    cards:
+    - grid_options:
+        columns: full
+        rows: auto
+      type: custom:button-card
+      template: coast_panel
+      custom_fields:
+        heading: <div class="eyebrow">Windy / Forecast</div><div class="serif" style="font-size:28px;margin-top:5px">Wind
+          over the Cape</div>
+        body:
+          card:
+            type: iframe
+            url: https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=in&metricTemp=%C2%B0F&metricWind=mph&zoom=8&overlay=wind&product=ecmwf&level=surface&lat=42.05&lon=-70.18&marker=true
+            aspect_ratio: 95%
+      styles:
+        card:
+        - padding: 20px 12px 12px
+        grid:
+        - grid-template-areas: '"heading" "body"'
+        - row-gap: 14px
+        custom_fields:
+          heading:
+          - text-align: left
+          - white-space: normal
+  - type: grid
+    cards:
+    - grid_options:
+        columns: full
+        rows: auto
+      type: custom:button-card
+      template: coast_panel
+      custom_fields:
+        body:
+          card:
+            type: picture-entity
+            entity: image.provincetown_tideglass_week_dark
+            show_name: false
+            show_state: false
+            tap_action:
+              action: more-info
+      styles:
+        card:
+        - padding: '0'
+    - grid_options:
+        columns: full
+        rows: auto
+      type: custom:button-card
+      template: coast_panel
+      custom_fields:
+        body: |-
+          [[[
+          const a = entity?.attributes || {};
+          const valid = entity && !['unknown','unavailable'].includes(entity.state) && Array.isArray(a.tides);
+          const title = '<div class="eyebrow">Seven days of tides</div><div class="serif" style="font-size:28px;margin:5px 0 24px">Plan around the water</div>';
+          if (!valid) return title + '<div class="muted">Tide predictions are unavailable. Tideglass will retry automatically.</div>';
+          const tz = {timeZone:'America/New_York'};
+          const unit = ['ft','m'].includes(a.height_unit) ? a.height_unit : '';
+          const groups = new Map();
+          for (const tide of a.tides) {
+            if (!['high','low'].includes(tide.type) || Number.isNaN(Date.parse(tide.time))) continue;
+            const d = new Date(tide.time);
+            const key = d.toLocaleDateString('en-CA',tz);
+            if (!groups.has(key)) groups.set(key,{date:d,low:[],high:[]});
+            groups.get(key)[tide.type].push(tide);
+          }
+          const cell = (tides,kind) => {
+            const color = kind === 'low' ? '#73dbc7' : '#efd19a';
+            const items = tides.map(t => {
+              const time = new Date(t.time).toLocaleTimeString('en-US',{...tz,hour:'numeric',minute:'2-digit'});
+              const h = t.height !== null && t.height !== '' && Number.isFinite(Number(t.height)) ? `${Number(t.height).toFixed(2)} ${unit}` : 'Height unavailable';
+              return `<div style="display:flex;justify-content:space-between;gap:6px;align-items:baseline;margin-top:7px;flex-wrap:wrap"><span style="font-size:14px;white-space:nowrap">${time}</span><span class="muted" style="font-size:11px;white-space:nowrap">${h}</span></div>`;
+            }).join('');
+            return `<div><div style="color:${color};font-size:10px;letter-spacing:1.7px;text-transform:uppercase">${kind === 'low' ? '↓ Low' : '↑ High'}</div>${items || '<div class="muted" style="margin-top:7px">—</div>'}</div>`;
+          };
+          const rows = [...groups.values()].map(day => `<div class="week-row"><div><div style="font-size:16px">${day.date.toLocaleDateString('en-US',{...tz,weekday:'long'})}</div><div class="muted" style="font-size:11px;margin-top:5px">${day.date.toLocaleDateString('en-US',{...tz,month:'short',day:'numeric'})}</div></div><div class="week-tides">${cell(day.low,'low')}${cell(day.high,'high')}</div></div>`).join('');
+          return title + (rows || '<div class="muted">No tide events are available for this week.</div>') + '<div class="muted" style="font-size:11px;margin-top:18px">Provincetown local time · Heights above MLLW · Tap for the full data</div>';
+          ]]]
+      entity: sensor.provincetown_tideglass_week
+      tap_action:
+        action: more-info
+      extra_styles: |2
+
+        .eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 2.3px; text-transform: uppercase; color: #73dbc7; line-height: 1.6; }
+        .serif { font-family: Georgia, 'Times New Roman', serif; font-weight: 400; letter-spacing: -.7px; }
+        .muted { color: #91abb5; }
+        .metric { display: flex; align-items: center; gap: 7px; font-size: 13px; color: #b9cdd2; }
+        .metric ha-icon { margin: 0; flex-shrink: 0; width: 16px; height: 16px; color: #73dbc7; }
+
+        .week-row {display:grid;grid-template-columns:125px minmax(0,1fr);gap:18px;padding:20px 0;border-top:1px solid #283e4a;}
+        .week-tides {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;}
+        @media(max-width:600px) {.week-row {grid-template-columns:1fr;gap:15px;}.week-tides {gap:18px;}}
+    column_span: 2
