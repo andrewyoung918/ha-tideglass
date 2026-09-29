@@ -50,9 +50,9 @@
     getCardSize() { return this._expanded?12:8; }
     getGridOptions() { return {columns:'full',min_columns:6}; }
     set hass(hass) { const prior=this._hass;this._hass=hass;if(prior?.connection!==hass.connection){this._stop();this._lastFetch=0;}this._start(); }
-    connectedCallback() { this._observer=new ResizeObserver(entries=>{const w=Math.round(entries[0].contentRect.width);if(w&&w!==this._width){this._width=w;this._render();}});this._observer.observe(this);this._start(); }
+    connectedCallback() { this._observer=new ResizeObserver(entries=>{const w=Math.round(entries[0].contentRect.width);if(w!==this._width){this._width=w;if(w)this._render();}});this._observer.observe(this);this._start(); }
     disconnectedCallback() {this._observer?.disconnect();this._stop();}
-    _stop() {this._generation++;clearInterval(this._timer);this._timer=null;this._unsubscribe?.();this._unsubscribe=null;this._subscribing=false;this._fetching=false;this._weatherAttempt=0;}
+    _stop() {this._generation++;cancelAnimationFrame(this._layoutFrame);clearInterval(this._timer);this._timer=null;this._unsubscribe?.();this._unsubscribe=null;this._subscribing=false;this._fetching=false;this._weatherAttempt=0;}
     _start() {
       if(!this.isConnected||!this._config||!this._hass) return;
       if(!this._timer) this._timer=setInterval(()=>{this._fetch();this._subscribeWeather();this._updateClock();},60000);
@@ -83,8 +83,7 @@
     }
     _render() {
       if(!this._config)return;
-      const old=this.shadowRoot.querySelector('.scroller');
-      const oldTime=old&&this._g?this._g.start+(old.scrollLeft/this._g.scale):null;
+            const oldTime=this._viewTime??(Date.now()-4*HOUR);this._viewTime=oldTime;
       const focused=this.shadowRoot.activeElement?.dataset?.action;
       const d=this._data;
       if(!d){this.shadowRoot.innerHTML=`<style>${css}</style><ha-card><div class="empty"><div class="eyebrow">Tideglass</div><strong>${escape(this._config.title||'The rhythm of the harbor')}</strong>${escape(this._error||'Bringing in the tides…')}${this._error?'<br><button class="retry">Try again</button>':''}</div></ha-card>`;this.shadowRoot.querySelector('.retry')?.addEventListener('click',()=>this._fetch(true));return;}
@@ -101,8 +100,8 @@
         <div class="weather-note" ${this._expanded?'':'hidden'}></div><div class="readout" aria-live="polite">Tap the curve to explore a time</div>
         <footer class="footer"><span>NOAA predictions · ${escape(d.unit)} above ${escape(d.datum)} · ${escape(d.time_zone.replace(/_/g,' '))}${d.curve==='illustrative'?'<br>Illustrative curve between high and low tides':''}</span><span class="hint">Swipe to follow the tide →</span></footer></ha-card>`;
       const scroller=this.shadowRoot.querySelector('.scroller');
-      scroller.scrollLeft=Math.max(0,((oldTime??(Date.now()-4*HOUR))-g.start)*g.scale);
-      scroller.addEventListener('scroll',()=>this._updateRange(),{passive:true});
+      cancelAnimationFrame(this._layoutFrame);this._layoutFrame=requestAnimationFrame(()=>{scroller.scrollLeft=Math.max(0,(oldTime-g.start)*g.scale);this._updateRange();});
+      scroller.addEventListener('scroll',()=>{this._viewTime=g.start+scroller.scrollLeft/g.scale;this._updateRange();},{passive:true});
       scroller.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();this._go(e.key==='ArrowLeft'?-1:e.key==='ArrowRight'?1:e.key==='Home'?'today':'end');}else if(e.key==='Enter'){e.preventDefault();const rect=scroller.getBoundingClientRect();scroller.dispatchEvent(new MouseEvent('click',{clientX:rect.left+scroller.clientWidth/2,clientY:rect.top+140,bubbles:true}));}});
       this.shadowRoot.querySelector('[data-action=expand]').onclick=()=>this._toggle();
       for(const action of ['previous','next','today'])this.shadowRoot.querySelector(`[data-action=${action}]`).onclick=()=>this._go(action==='previous'?-1:action==='next'?1:'today');
