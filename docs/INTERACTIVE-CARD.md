@@ -1,8 +1,8 @@
 # Interactive Tideglass card
 
-Tideglass 0.2.0 bundles a responsive Home Assistant card. Its colors match Coast: deep navy, seafoam tide lines, warm gold solar markers, and a quiet blue offset for nighttime.
+Tideglass 0.2 bundles a responsive Home Assistant card. Its colors match Coast: deep navy, seafoam tide lines, warm gold solar markers, and a quiet blue offset for nighttime.
 
-After upgrading in HACS, restart Home Assistant and reload the browser. The integration registers the bundled JavaScript automatically; no CDN, extra HACS card, new API key, or manual resource entry is needed. Choose **Tideglass** in the card picker, or use:
+Use 0.2.2 or newer for the interaction refinements verified in Coast. When upgrading from 0.1, check configuration, restart Home Assistant and reload the browser. The 0.2.1/0.2.2 refinements change only JavaScript and manifest metadata; an already running 0.2 backend serves the updated asset after a browser reload. The integration registers the bundled JavaScript automatically; no CDN, extra HACS card, new API key, or manual resource entry is needed. Choose **Tideglass** in the card picker, or use:
 
 ```yaml
 type: custom:tideglass-card
