@@ -29,3 +29,17 @@ test('Curve rendering and previous-day navigation work without newer array metho
   assert.doesNotMatch(result.svg,/NaN|undefined/);
   assert.equal(result.destination,0);
 });
+
+
+test('A cached card registration receives the newer rendering methods without redefining the element',()=>{
+  class CachedCard {getCardSize(){return 8;}_render(){return 'The rhythm of the harbor';}}
+  let definitions=0;
+  const cached={HTMLElement:class{},customElements:{get:()=>CachedCard,define:()=>definitions++},window:{customCards:[]},module:{exports:{}}};
+  vm.createContext(cached);vm.runInContext(fs.readFileSync('custom_components/tideglass/frontend/tideglass-card.js','utf8'),cached);
+  assert.equal(definitions,0);assert.equal(new CachedCard().getCardSize(),7);
+  assert.equal(CachedCard.prototype._render,cached.module.exports.TideglassCard.prototype._render);
+  assert.equal(CachedCard.frontendRevision,20501);
+  const newerRender=()=> 'future card';CachedCard.prototype._render=newerRender;CachedCard.frontendRevision=20502;
+  vm.runInContext(fs.readFileSync('custom_components/tideglass/frontend/tideglass-card.js','utf8'),cached);
+  assert.equal(CachedCard.prototype._render,newerRender);
+});

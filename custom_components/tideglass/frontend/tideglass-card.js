@@ -164,7 +164,17 @@
       scroller.addEventListener('click',e=>{const chartRect=this.shadowRoot.querySelector('.chart').getBoundingClientRect();if((moved&&e.detail!==0)||e.clientY<chartRect.top||e.clientY>chartRect.bottom)return;const rect=scroller.getBoundingClientRect(),x=e.clientX-rect.left+scroller.scrollLeft,time=this._g.start+(x-this._g.pad)/this._g.scale,h=heightAt(this._data.samples,time);if(h===null)return;const d=this._data;this.shadowRoot.querySelector('.readout').textContent=`${dateLabel(time,d.time_zone,true)} · ${clock(time,d.time_zone,true)} · ${h.toFixed(2)} ${d.unit}${d.curve==='illustrative'?' · illustrative':''}`;this.shadowRoot.querySelector('.inspection').innerHTML=`<line x1="${x}" x2="${x}" y1="64" y2="247"/><circle cx="${x}" cy="${this._g.y(h)}" r="5"/>`;});
     }
   }
-  if(!customElements.get('tideglass-card'))customElements.define('tideglass-card',TideglassCard);
+  // HA can load the integration URL and a newer dashboard resource in either order.
+  // These releases share the same constructor state; upgrade their methods so a
+  // cached 0.2.x registration cannot hide a newer frontend-only patch.
+  TideglassCard.frontendRevision=20501;
+  const registered=customElements.get('tideglass-card');
+  if(!registered)customElements.define('tideglass-card',TideglassCard);
+  else if(typeof registered==='function'&&(registered.frontendRevision||0)<TideglassCard.frontendRevision){
+    const methods=Object.getOwnPropertyDescriptors(TideglassCard.prototype);delete methods.constructor;
+    Object.defineProperties(registered.prototype,methods);
+    registered.frontendRevision=TideglassCard.frontendRevision;
+  }
   window.customCards=window.customCards||[];if(!window.customCards.some(c=>c.type==='tideglass-card'))window.customCards.push({type:'tideglass-card',name:'Tideglass',description:'An interactive tide timeline with sunrise, sunset, and a shared four-hour weather forecast.',preview:true,documentationURL:'https://github.com/andrewyoung918/ha-tideglass/blob/codex/tideglass/docs/INTERACTIVE-CARD.md'});
   // Pure helpers are exported only in Node's isolated test harness.
   if(typeof module!=='undefined')module.exports={heightAt,forecastAt,escape,numeric,TideglassCard};
