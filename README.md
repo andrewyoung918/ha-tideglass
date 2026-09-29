@@ -28,7 +28,7 @@ High/low sensors use NOAA’s actual high/low prediction product. Harmonic stati
 
 ## A dashboard for the coast
 
-[`examples/weather-dashboard-aesthetic.yaml`](examples/weather-dashboard-aesthetic.yaml) is the styled Coast dashboard: Tideglass’s navy, seafoam and gold palette, a large current-weather panel, a six-hour outlook, full-width tide curves, explicit high/low times and heights, radar, wind, and a readable seven-day tide table. It uses the HACS **button-card** and **clock-weather-card** frontend cards. Colors stay scoped to the dashboard; no global theme change is needed. See the [styled dashboard guide](docs/DASHBOARD.md).
+[`examples/weather-dashboard-aesthetic.yaml`](examples/weather-dashboard-aesthetic.yaml) is the styled Coast dashboard: Tideglass’s navy, seafoam and gold palette, Pirate Weather current conditions, next-hour rain guidance, a six-hour outlook, a five-day forecast, full-width tide curves, explicit high/low times and heights, radar, wind, and a readable seven-day tide table. It uses the HACS **button-card** and **clock-weather-card** frontend cards. Pirate Weather is a separate optional integration and needs its own API key; Tideglass itself remains key-free. Colors stay scoped to the dashboard; no global theme change is needed. See the [styled dashboard guide](docs/DASHBOARD.md).
 
 [`examples/weather-dashboard.yaml`](examples/weather-dashboard.yaml) combines the existing NWS Provincetown weather entity (`weather.kpvc`), supported day/night and hourly forecasts, today’s tide curve, upcoming tide tiles, a Windy radar map, a separate Windy wind map, and a seven-day curve/calendar. Native HA cards only; no frontend custom-card dependency.
 
@@ -56,7 +56,7 @@ Predictions refresh every six hours and at the next minute tick after station-lo
 
 A saved prediction cache survives HA restarts. After a failed refresh, still-covered predictions remain usable for at most 48 hours from the last successful fetch, with status `cached` and retries every 15 minutes. Once expired or outside the current tide cycle, entities become unavailable. The future tide table is bounded to seven local calendar days, avoiding huge recorder attributes. No API credentials are stored.
 
-Tide predictions do not account for storm surge or actual water-level observations. The maps and NWS weather integration have their own data availability and update behavior.
+Tide predictions do not account for storm surge or actual water-level observations. The maps and separate weather integrations have their own data availability and update behavior.
 
 ## Development status
 

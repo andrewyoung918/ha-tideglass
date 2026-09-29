@@ -117,11 +117,48 @@ views:
           <div style="display:flex;gap:20px;flex-wrap:wrap;border-top:1px solid #283e4a;padding-top:18px;margin-top:22px">
           <div class="metric"><ha-icon icon="mdi:weather-windy"></ha-icon>${speed} ${ok ? bearing : ''}</div>
           <div class="metric"><ha-icon icon="mdi:water-percent"></ha-icon>${humidity} humidity</div></div>
-          <div class="muted" style="font-size:10px;letter-spacing:.7px;margin-top:20px">NATIONAL WEATHER SERVICE · KPVC</div>`;
+          <div class="muted" style="font-size:10px;letter-spacing:.7px;margin-top:20px">PIRATE WEATHER · PROVINCETOWN</div>`;
           ]]]
-      entity: weather.kpvc
+      entity: weather.coast_weather
       tap_action:
         action: more-info
+    - type: custom:button-card
+      template: coast_panel
+      update_timer: 60000
+      grid_options:
+        columns: full
+        rows: auto
+      tap_action:
+        action: more-info
+        entity: sensor.coast_weather_minutely_summary
+      triggers_update:
+      - sensor.coast_weather_precip_probability
+      - sensor.coast_weather_precip_intensity
+      - sensor.coast_weather_apparent_temperature
+      - sensor.coast_weather_uv_index
+      - sensor.coast_weather_time
+      custom_fields:
+        body: |-
+          [[[
+          const safe = v => String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+          const available = s => s && s.state !== '' && !['unknown','unavailable','none','None'].includes(s.state);
+          const numeric = s => !stale && available(s) && Number.isFinite(Number(s.state));
+          const s = states['sensor.coast_weather_minutely_summary'];
+          const chance = states['sensor.coast_weather_precip_probability'];
+          const intensity = states['sensor.coast_weather_precip_intensity'];
+          const feels = states['sensor.coast_weather_apparent_temperature'];
+          const uv = states['sensor.coast_weather_uv_index'];
+          const time = states['sensor.coast_weather_time'];
+          const stamp = available(time) ? Date.parse(time.state) : NaN;
+          const stale = Number.isFinite(stamp) && Date.now()-stamp > 3600000;
+          const summary = stale ? 'Waiting for a fresh rain forecast' : available(s) ? safe(s.state) : 'Rain outlook unavailable';
+          const metric = (label,value) => `<div><div class="muted" style="font-size:10px;letter-spacing:1px;text-transform:uppercase">${label}</div><div style="font-size:19px;margin-top:6px">${value}</div></div>`;
+          const numberWithUnit = (s,digits) => numeric(s) ? `${Number(s.state).toFixed(digits)} <span style="font-size:12px;color:#91abb5">${safe(s.attributes.unit_of_measurement || '')}</span>` : '—';
+          const percent = numeric(chance) && Number(chance.state)>=0 && Number(chance.state)<=100 ? `${Math.round(Number(chance.state))}%` : '—';
+          const when = Number.isFinite(stamp) ? new Date(stamp).toLocaleTimeString('en-US',{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'}) : null;
+          const note = stale ? 'Forecast update delayed · Check Pirate Weather' : when ? `Forecast time ${when} · Refreshes every 15 minutes` : 'Forecast time unavailable · Check Pirate Weather';
+          return `<div class="eyebrow">Rain / The next 60 minutes</div><div class="serif" style="font-size:25px;line-height:1.25;margin:14px 0 22px">${summary}</div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 16px;border-top:1px solid #283e4a;padding-top:18px">${metric('Current chance',percent)}${metric('Current rate',numberWithUnit(intensity,3))}${metric('Feels like',numberWithUnit(feels,0))}${metric('UV index',numberWithUnit(uv,1))}</div><div style="font-size:10px;line-height:1.5;color:${stale?'#efd19a':'#91abb5'};margin-top:20px">${note}</div>`;
+          ]]]
   - type: grid
     cards:
     - grid_options:
@@ -135,7 +172,7 @@ views:
         body:
           card:
             type: custom:clock-weather-card
-            entity: weather.kpvc
+            entity: weather.coast_weather
             sun_entity: sun.sun
             weather_icon_type: line
             animated_icon: false
@@ -145,6 +182,39 @@ views:
             time_pattern: h a
             hide_today_section: true
             hourly_forecast: true
+            time_zone: America/New_York
+            show_decimal: false
+      styles:
+        card:
+        - padding: 20px
+        grid:
+        - grid-template-areas: '"heading" "body"'
+        - row-gap: 14px
+        custom_fields:
+          heading:
+          - text-align: left
+          - white-space: normal
+    - grid_options:
+        columns: full
+        rows: auto
+      type: custom:button-card
+      template: coast_panel
+      custom_fields:
+        heading: <div class="eyebrow">Pirate Weather / Daily forecast</div><div class="serif" style="font-size:28px;margin-top:5px">The
+          week ahead</div>
+        body:
+          card:
+            type: custom:clock-weather-card
+            entity: weather.coast_weather
+            sun_entity: sun.sun
+            weather_icon_type: line
+            animated_icon: false
+            forecast_rows: 5
+            locale: en-US
+            time_format: 12
+            time_pattern: h a
+            hide_today_section: true
+            hourly_forecast: false
             time_zone: America/New_York
             show_decimal: false
       styles:
@@ -273,12 +343,10 @@ views:
         body:
           card:
             type: markdown
-            content: 'Tide heights are NOAA predictions relative to **mean lower low water (MLLW)**. Wind and weather
-              can change actual water levels.
+            content: |-
+              Tide heights are NOAA predictions relative to **mean lower low water (MLLW)**. Wind and weather can change actual water levels.
 
-
-              [National Weather Service](https://forecast.weather.gov/MapClick.php?lat=42.05&lon=-70.18) · [NOAA
-              tide table](https://tidesandcurrents.noaa.gov/noaatidepredictions.html?id=8446121)'
+              [National Weather Service](https://forecast.weather.gov/MapClick.php?lat=42.05&lon=-70.18) · [NOAA tide table](https://tidesandcurrents.noaa.gov/noaatidepredictions.html?id=8446121)
       styles:
         card:
         - padding: 8px
