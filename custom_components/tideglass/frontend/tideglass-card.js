@@ -1,4 +1,4 @@
-/* Tideglass 0.2.0 • MIT • Bundled, dependency-free Home Assistant card. */
+/* Tideglass 0.2.1 • MIT • Bundled, dependency-free Home Assistant card. */
 (() => {
   const HOUR = 3600000;
   const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -144,11 +144,11 @@
     _updateRange(){const scroller=this.shadowRoot.querySelector('.scroller');if(!scroller||!this._data)return;const time=this._g.start+scroller.scrollLeft/this._g.scale;this.shadowRoot.querySelector('.range').textContent=dateLabel(Math.min(time+1,this._g.end-1),this._data.time_zone);this.shadowRoot.querySelector('[data-action=previous]').disabled=scroller.scrollLeft<2;this.shadowRoot.querySelector('[data-action=next]').disabled=scroller.scrollLeft>=scroller.scrollWidth-scroller.clientWidth-2;}
     _go(direction){const scroller=this.shadowRoot.querySelector('.scroller'),g=this._g;if(!scroller)return;const starts=this._data.days.map(d=>g.x(stamp(d.start))-g.pad);let left;scroller.classList.toggle('free-position',direction==='today');if(direction==='today')left=Math.max(0,(Date.now()-g.start-4*HOUR)*g.scale);else if(direction==='end')left=scroller.scrollWidth;else if(direction>0)left=starts.find(x=>x>scroller.scrollLeft+4)??scroller.scrollWidth;else left=starts.toReversed().find(x=>x<scroller.scrollLeft-4)??0;scroller.scrollTo({left,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});}
     _bindPointer(scroller){
-      let drag=null,moved=false;
+      let drag=null,moved=false,touchStart=null;
       scroller.addEventListener('wheel',()=>scroller.classList.remove('free-position'),{passive:true});
-      scroller.addEventListener('pointerdown',e=>{scroller.classList.remove('free-position');moved=false;if(e.pointerType==='mouse'&&e.button===0){drag={x:e.clientX,left:scroller.scrollLeft};scroller.setPointerCapture(e.pointerId);}});
-      scroller.addEventListener('pointermove',e=>{if(!drag)return;const delta=e.clientX-drag.x;if(Math.abs(delta)>5)moved=true;if(moved){scroller.classList.add('dragging');scroller.scrollLeft=drag.left-delta;}});
-      const finish=e=>{drag=null;scroller.classList.remove('dragging');if(scroller.hasPointerCapture(e.pointerId))scroller.releasePointerCapture(e.pointerId);};
+      scroller.addEventListener('pointerdown',e=>{touchStart=e.clientX;moved=false;if(e.pointerType==='mouse'&&e.button===0){drag={x:e.clientX,left:scroller.scrollLeft};scroller.setPointerCapture(e.pointerId);}});
+      scroller.addEventListener('pointermove',e=>{if(!drag){if(touchStart!==null&&Math.abs(e.clientX-touchStart)>5){moved=true;scroller.classList.remove('free-position');}return;}const delta=e.clientX-drag.x;if(Math.abs(delta)>5)moved=true;if(moved){scroller.classList.add('dragging');scroller.classList.remove('free-position');scroller.scrollLeft=drag.left-delta;}});
+      const finish=e=>{drag=null;touchStart=null;scroller.classList.remove('dragging');if(scroller.hasPointerCapture(e.pointerId))scroller.releasePointerCapture(e.pointerId);};
       scroller.addEventListener('pointerup',finish);scroller.addEventListener('pointercancel',finish);
       scroller.addEventListener('click',e=>{const chartRect=this.shadowRoot.querySelector('.chart').getBoundingClientRect();if((moved&&e.detail!==0)||e.clientY<chartRect.top||e.clientY>chartRect.bottom)return;const rect=scroller.getBoundingClientRect(),x=e.clientX-rect.left+scroller.scrollLeft,time=this._g.start+(x-this._g.pad)/this._g.scale,h=heightAt(this._data.samples,time);if(h===null)return;const d=this._data;this.shadowRoot.querySelector('.readout').textContent=`${dateLabel(time,d.time_zone,true)} · ${clock(time,d.time_zone,true)} · ${h.toFixed(2)} ${d.unit}${d.curve==='illustrative'?' · illustrative':''}`;this.shadowRoot.querySelector('.inspection').innerHTML=`<line x1="${x}" x2="${x}" y1="64" y2="247"/><circle cx="${x}" cy="${this._g.y(h)}" r="5"/>`;});
     }
@@ -156,5 +156,5 @@
   if(!customElements.get('tideglass-card'))customElements.define('tideglass-card',TideglassCard);
   window.customCards=window.customCards||[];if(!window.customCards.some(c=>c.type==='tideglass-card'))window.customCards.push({type:'tideglass-card',name:'Tideglass',description:'An interactive tide timeline with sunrise, sunset, and a shared four-hour weather forecast.',preview:true,documentationURL:'https://github.com/andrewyoung918/ha-tideglass/blob/codex/tideglass/docs/INTERACTIVE-CARD.md'});
   // Pure helpers are exported only in Node's isolated test harness.
-  if(typeof module!=='undefined')module.exports={heightAt,forecastAt,escape,numeric};
+  if(typeof module!=='undefined')module.exports={heightAt,forecastAt,escape,numeric,TideglassCard};
 })();
