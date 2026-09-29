@@ -12,9 +12,9 @@ button_card_templates:
       card:
       - background: '#101f2b'
       - border: '1px solid #283e4a'
-      - border-radius: 24px
+      - border-radius: 22px
       - box-shadow: 0 8px 32px rgba(0,0,0,0.10)
-      - padding: 24px
+      - padding: 18px
       - color: '#edf5f2'
       - font-family: var(--primary-font-family)
       - font-size: 14px
@@ -56,10 +56,16 @@ button_card_templates:
       .muted { color: #91abb5; }
       .metric { display: flex; align-items: center; gap: 7px; font-size: 13px; color: #b9cdd2; }
       .metric ha-icon { margin: 0; flex-shrink: 0; width: 16px; height: 16px; color: #73dbc7; }
+
+      .compact-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.3px; color: #91abb5; line-height: 1.4; }
+      .compact-value { margin-top: 4px; font-size: 16px; color: #edf5f2; line-height: 1.3; }
+      .card-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+      .card-top ha-icon { margin: 0; width: 18px; height: 18px; color: #91abb5; }
+      .compact-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; }
+      .divider { border-top: 1px solid #283e4a; margin-top: 14px; padding-top: 12px; }
 views:
-- title: At the water’s edge
+- title: Summary
   path: coast
-  icon: mdi:waves
   type: sections
   max_columns: 2
   dense_section_placement: false
@@ -71,21 +77,145 @@ views:
   sections:
   - type: grid
     cards:
-    - grid_options:
+    - type: custom:button-card
+      template: coast_panel
+      grid_options:
         columns: full
         rows: auto
-      type: custom:button-card
-      template: coast_panel
       custom_fields:
-        body: <div class="eyebrow">Tideglass / Provincetown</div><div class="serif" style="font-size:clamp(32px,5vw,46px);line-height:1.15;margin-top:9px">At
-          the water’s edge.</div><div class="muted" style="font-size:13px;margin-top:12px;line-height:1.5">Weather,
-          wind &amp; the rhythm of the harbor</div>
+        body: |-
+          <div class="eyebrow">Tideglass / Provincetown</div><div class="serif" style="font-size:29px;line-height:1.2;margin-top:4px">At a glance.</div>
       styles:
         card:
         - background: transparent
         - border: '0'
         - box-shadow: none
-        - padding: 14px 8px 20px
+        - padding: 2px 4px 6px
+    column_span: 2
+  - type: grid
+    cards:
+    - type: custom:button-card
+      template: coast_panel
+      grid_options:
+        columns: full
+        rows: auto
+      custom_fields:
+        body: |-
+          [[[
+          const safe = v => String(v ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+          const available = s => s && s.state !== '' && !['unknown','unavailable','none','None'].includes(s.state);
+          const number = v => v !== null && v !== undefined && String(v).trim() !== '' && Number.isFinite(Number(v));
+          const w = states['weather.coast_weather'];
+          const stamp = Date.parse(states['sensor.coast_weather_time']?.state);
+          const stale = Number.isFinite(stamp) && Date.now()-stamp > 3600000;
+          const ok = available(w) && !stale;
+          const a = w?.attributes || {};
+          const conditions = {'clear-night':'Clear night','cloudy':'Cloudy','exceptional':'Exceptional weather','fog':'Fog','hail':'Hail','lightning':'Thunderstorms','lightning-rainy':'Thunderstorms','partlycloudy':'Partly cloudy','pouring':'Heavy rain','rainy':'Rain','snowy':'Snow','snowy-rainy':'Wintry mix','sunny':'Sunny','windy':'Windy','windy-variant':'Windy'};
+          const icons = {'clear-night':'weather-night','cloudy':'weather-cloudy','fog':'weather-fog','hail':'weather-hail','lightning':'weather-lightning','lightning-rainy':'weather-lightning-rainy','partlycloudy':'weather-partly-cloudy','pouring':'weather-pouring','rainy':'weather-rainy','snowy':'weather-snowy','snowy-rainy':'weather-snowy-rainy','sunny':'weather-sunny','windy':'weather-windy','windy-variant':'weather-windy-variant'};
+          const unit = ['°F','°C'].includes(a.temperature_unit) ? a.temperature_unit : '°';
+          const temp = ok && number(a.temperature) ? Math.round(Number(a.temperature)) : '—';
+          const feels = ok && number(a.apparent_temperature) ? `Feels like ${Math.round(Number(a.apparent_temperature))}${unit}` : 'Feels like unavailable';
+          const rain = states['sensor.coast_weather_minutely_summary'];
+          const summary = stale ? 'Waiting for a fresh forecast' : available(rain) ? safe(rain.state) : 'Rain outlook unavailable';
+          const chance = states['sensor.coast_weather_precip_probability'];
+          const pct = !stale && available(chance) && number(chance.state) && Number(chance.state)>=0 && Number(chance.state)<=100 ? `${Math.round(Number(chance.state))}%` : '—';
+          const windUnit = ['mph','km/h','m/s','kn'].includes(a.wind_speed_unit) ? a.wind_speed_unit : '';
+          const bearing = number(a.wind_bearing) ? ['N','NE','E','SE','S','SW','W','NW'][(Math.round(Number(a.wind_bearing)/45)%8+8)%8] : '';
+          const wind = ok && number(a.wind_speed) ? `${Math.round(Number(a.wind_speed))} ${windUnit}` : '—';
+          const humidity = ok && number(a.humidity) ? `${Math.round(Number(a.humidity))}%` : '—';
+          const metric=(label,val)=>`<div><div class="compact-label">${label}</div><div class="compact-value">${val}</div></div>`;
+          return `<div class="card-top"><div class="eyebrow">Weather / Now</div><ha-icon icon="mdi:arrow-top-right"></ha-icon></div>
+          <div style="display:flex;align-items:center;gap:13px;margin-top:12px"><div class="serif" style="font-size:54px;line-height:1">${temp}<span style="font-size:23px;color:#91abb5">${unit}</span></div><div style="flex:1"><div style="font-size:17px">${ok ? conditions[w.state] || 'Weather' : stale ? 'Update delayed' : 'Unavailable'}</div><div class="muted" style="font-size:12px;margin-top:5px">${feels}</div></div><ha-icon icon="mdi:${ok ? icons[w.state] || 'weather-cloudy' : 'weather-cloudy-alert'}" style="margin:0;width:39px;height:39px;flex-shrink:0;color:#efd19a"></ha-icon></div>
+          <div class="divider"><div class="compact-label">The next hour</div><div class="serif" style="font-size:20px;line-height:1.3;margin-top:5px;color:${stale?'#efd19a':'#edf5f2'}">${summary}</div></div>
+          <div class="compact-grid" style="margin-top:14px">${metric('Rain chance',pct)}${metric(ok && bearing ? `Wind · ${bearing}` : 'Wind',wind)}${metric('Humidity',humidity)}</div>`;
+
+          ]]]
+      update_timer: 60000
+      tap_action:
+        action: navigate
+        navigation_path: /dashboard-coast/weather
+  - type: grid
+    cards:
+    - type: custom:button-card
+      template: coast_panel
+      grid_options:
+        columns: full
+        rows: auto
+      custom_fields:
+        body: |-
+          [[[
+          const get = suffix => states['sensor.provincetown_tideglass_'+suffix];
+          const available = s => s && s.state !== '' && !['unknown','unavailable','none','None'].includes(s.state);
+          const number = s => available(s) && Number.isFinite(Number(s.state));
+          const status = get('prediction_status')?.state;
+          const ok = ['fresh','cached'].includes(status);
+          const direction = get('tide_direction')?.state;
+          const heading = ok && direction==='rising' ? 'The tide is rising' : ok && direction==='falling' ? 'The tide is falling' : 'Tide outlook unavailable';
+          const tz={timeZone:'America/New_York'};
+          const fmtTime = s => ok && available(s) && Number.isFinite(Date.parse(s.state)) ? new Date(s.state).toLocaleTimeString('en-US',{...tz,hour:'numeric',minute:'2-digit'}) : '—';
+          const fmtDate = s => ok && available(s) && Number.isFinite(Date.parse(s.state)) ? new Date(s.state).toLocaleDateString('en-US',{...tz,weekday:'short',month:'short',day:'numeric'}) : 'Unavailable';
+          const height = s => ok && number(s) ? `${Number(s.state).toFixed(2)} ${['ft','m'].includes(s.attributes.unit_of_measurement) ? s.attributes.unit_of_measurement : ''}` : '—';
+          const event = (kind,color) => `<div><div class="compact-label" style="color:${color}">Next ${kind}</div><div class="serif" style="font-size:27px;line-height:1.15;margin-top:6px;white-space:nowrap">${fmtTime(get('next_'+kind+'_time'))}</div><div class="muted" style="font-size:11px;margin-top:4px">${fmtDate(get('next_'+kind+'_time'))}</div><div style="color:${color};font-size:14px;margin-top:7px">${height(get('next_'+kind+'_height'))}<span class="muted" style="font-size:9px;margin-left:4px">MLLW</span></div></div>`;
+          const recent=get('most_recent_tide')?.state;
+          const recentLabel=recent==='low'?'Low':recent==='high'?'High':'Tide';
+          const footer=status==='cached'?'Stored NOAA predictions · reconnecting':!ok?'Waiting for NOAA predictions':`${recentLabel} at ${fmtTime(get('most_recent_tide_time'))} · Predicted now ${height(get('predicted_height'))}`;
+          return `<div class="card-top"><div class="eyebrow">Tides / Harbor</div><ha-icon icon="mdi:arrow-top-right"></ha-icon></div><div class="serif" style="font-size:24px;line-height:1.25;margin-top:11px">${heading}</div><div class="divider" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">${event('high','#efd19a')}${event('low','#73dbc7')}</div><div style="font-size:10px;line-height:1.5;color:${status==='fresh'?'#91abb5':'#efd19a'};margin-top:14px">${footer}</div>`;
+
+          ]]]
+      update_timer: 60000
+      tap_action:
+        action: navigate
+        navigation_path: /dashboard-coast/tides
+  - type: grid
+    cards:
+    - type: custom:button-card
+      template: coast_panel
+      grid_options:
+        columns: full
+        rows: auto
+      custom_fields:
+        body: |-
+          [[[
+          const safe = v => String(v ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+          const s = states['sensor.coast_weather_hourly_summary'];
+          const stamp=Date.parse(states['sensor.coast_weather_time']?.state);
+          const stale=Number.isFinite(stamp) && Date.now()-stamp>3600000;
+          const text=stale?'Forecast update delayed':s && s.state && !['unknown','unavailable','None','none'].includes(s.state)?safe(s.state):'Forecast outlook unavailable';
+          return `<div style="display:flex;align-items:center;gap:15px"><ha-icon icon="mdi:weather-partly-cloudy" style="margin:0;width:27px;height:27px;flex-shrink:0;color:#efd19a"></ha-icon><div style="flex:1"><div class="eyebrow">Looking ahead</div><div style="font-size:15px;line-height:1.45;margin-top:3px;color:${stale?'#efd19a':'#edf5f2'}">${text}</div></div><ha-icon icon="mdi:chevron-right" style="margin:0;width:19px;height:19px;flex-shrink:0;color:#91abb5"></ha-icon></div>`;
+
+          ]]]
+      update_timer: 60000
+      tap_action:
+        action: navigate
+        navigation_path: /dashboard-coast/weather
+    column_span: 2
+- title: Weather
+  path: weather
+  type: sections
+  max_columns: 2
+  dense_section_placement: false
+  background:
+    image: data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%228%22%20height%3D%228%22%3E%3Cpath%20fill%3D%22%230b1720%22%20d%3D%22M0%200h8v8H0z%22/%3E%3C/svg%3E
+    opacity: 100
+    size: cover
+    attachment: fixed
+  sections:
+  - type: grid
+    cards:
+    - type: custom:button-card
+      template: coast_panel
+      grid_options:
+        columns: full
+        rows: auto
+      custom_fields:
+        body: |-
+          <div class="eyebrow">Provincetown / Pirate Weather</div><div class="serif" style="font-size:29px;line-height:1.2;margin-top:4px">The weather ahead.</div>
+      styles:
+        card:
+        - background: transparent
+        - border: '0'
+        - box-shadow: none
+        - padding: 2px 4px 6px
     column_span: 2
   - type: grid
     cards:
@@ -235,17 +365,60 @@ views:
       type: custom:button-card
       template: coast_panel
       custom_fields:
+        heading: <div class="eyebrow">Live radar / Windy</div><div class="serif" style="font-size:24px;margin-top:4px">Rain
+          on the horizon</div>
         body:
           card:
-            type: picture-entity
-            entity: image.provincetown_tideglass_today_dark
-            show_name: false
-            show_state: false
-            tap_action:
-              action: more-info
+            type: iframe
+            url: https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=in&metricTemp=%C2%B0F&metricWind=mph&zoom=8&overlay=radar&product=radar&level=surface&lat=42.05&lon=-70.18&marker=true
+            aspect_ratio: 60%
       styles:
         card:
-        - padding: '0'
+        - padding: 20px 12px 12px
+        grid:
+        - grid-template-areas: '"heading" "body"'
+        - row-gap: 14px
+        custom_fields:
+          heading:
+          - text-align: left
+          - white-space: normal
+    column_span: 2
+- title: Tides
+  path: tides
+  type: sections
+  max_columns: 2
+  dense_section_placement: false
+  background:
+    image: data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%228%22%20height%3D%228%22%3E%3Cpath%20fill%3D%22%230b1720%22%20d%3D%22M0%200h8v8H0z%22/%3E%3C/svg%3E
+    opacity: 100
+    size: cover
+    attachment: fixed
+  sections:
+  - type: grid
+    cards:
+    - type: custom:button-card
+      template: coast_panel
+      grid_options:
+        columns: full
+        rows: auto
+      custom_fields:
+        body: |-
+          <div class="eyebrow">Provincetown / NOAA 8446121</div><div class="serif" style="font-size:29px;line-height:1.2;margin-top:4px">Follow the water.</div>
+      styles:
+        card:
+        - background: transparent
+        - border: '0'
+        - box-shadow: none
+        - padding: 2px 4px 6px
+    column_span: 2
+  - type: grid
+    cards:
+    - type: custom:tideglass-card
+      entity: sensor.provincetown_tideglass_week
+      weather_entity: weather.coast_weather
+      grid_options:
+        columns: full
+        rows: auto
     column_span: 2
   - type: grid
     cards:
@@ -358,73 +531,6 @@ views:
       type: custom:button-card
       template: coast_panel
       custom_fields:
-        heading: <div class="eyebrow">Live radar</div><div class="serif" style="font-size:28px;margin-top:5px">Rain
-          on the horizon</div>
-        body:
-          card:
-            type: iframe
-            url: https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=in&metricTemp=%C2%B0F&metricWind=mph&zoom=8&overlay=radar&product=radar&level=surface&lat=42.05&lon=-70.18&marker=true
-            aspect_ratio: 95%
-      styles:
-        card:
-        - padding: 20px 12px 12px
-        grid:
-        - grid-template-areas: '"heading" "body"'
-        - row-gap: 14px
-        custom_fields:
-          heading:
-          - text-align: left
-          - white-space: normal
-  - type: grid
-    cards:
-    - grid_options:
-        columns: full
-        rows: auto
-      type: custom:button-card
-      template: coast_panel
-      custom_fields:
-        heading: <div class="eyebrow">Windy / Forecast</div><div class="serif" style="font-size:28px;margin-top:5px">Wind
-          over the Cape</div>
-        body:
-          card:
-            type: iframe
-            url: https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=in&metricTemp=%C2%B0F&metricWind=mph&zoom=8&overlay=wind&product=ecmwf&level=surface&lat=42.05&lon=-70.18&marker=true
-            aspect_ratio: 95%
-      styles:
-        card:
-        - padding: 20px 12px 12px
-        grid:
-        - grid-template-areas: '"heading" "body"'
-        - row-gap: 14px
-        custom_fields:
-          heading:
-          - text-align: left
-          - white-space: normal
-  - type: grid
-    cards:
-    - grid_options:
-        columns: full
-        rows: auto
-      type: custom:button-card
-      template: coast_panel
-      custom_fields:
-        body:
-          card:
-            type: picture-entity
-            entity: image.provincetown_tideglass_week_dark
-            show_name: false
-            show_state: false
-            tap_action:
-              action: more-info
-      styles:
-        card:
-        - padding: '0'
-    - grid_options:
-        columns: full
-        rows: auto
-      type: custom:button-card
-      template: coast_panel
-      custom_fields:
         body: |-
           [[[
           const a = entity?.attributes || {};
@@ -467,4 +573,90 @@ views:
         .week-row {display:grid;grid-template-columns:125px minmax(0,1fr);gap:18px;padding:20px 0;border-top:1px solid #283e4a;}
         .week-tides {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;}
         @media(max-width:600px) {.week-row {grid-template-columns:1fr;gap:15px;}.week-tides {gap:18px;}}
+    column_span: 2
+- title: Wind
+  path: wind
+  type: sections
+  max_columns: 2
+  dense_section_placement: false
+  background:
+    image: data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%228%22%20height%3D%228%22%3E%3Cpath%20fill%3D%22%230b1720%22%20d%3D%22M0%200h8v8H0z%22/%3E%3C/svg%3E
+    opacity: 100
+    size: cover
+    attachment: fixed
+  sections:
+  - type: grid
+    cards:
+    - type: custom:button-card
+      template: coast_panel
+      grid_options:
+        columns: full
+        rows: auto
+      custom_fields:
+        body: |-
+          <div class="eyebrow">Provincetown / Wind</div><div class="serif" style="font-size:29px;line-height:1.2;margin-top:4px">Read the breeze.</div>
+      styles:
+        card:
+        - background: transparent
+        - border: '0'
+        - box-shadow: none
+        - padding: 2px 4px 6px
+    column_span: 2
+  - type: grid
+    cards:
+    - type: custom:button-card
+      template: coast_panel
+      grid_options:
+        columns: full
+        rows: auto
+      custom_fields:
+        body: |-
+          [[[
+          const number=v=>v!==null && v!==undefined && String(v).trim()!=='' && Number.isFinite(Number(v));
+          const w=states['weather.coast_weather'];
+          const a=w?.attributes||{};
+          const stamp=Date.parse(states['sensor.coast_weather_time']?.state);
+          const stale=Number.isFinite(stamp)&&Date.now()-stamp>3600000;
+          const ok=w&&!['unknown','unavailable'].includes(w.state)&&!stale;
+          const unit=['mph','km/h','m/s','kn'].includes(a.wind_speed_unit)?a.wind_speed_unit:'';
+          const bearing=ok && number(a.wind_bearing)?(Number(a.wind_bearing)%360+360)%360:null;
+          const direction=bearing!==null?['N','NE','E','SE','S','SW','W','NW'][Math.round(bearing/45)%8]:'—';
+          const speed=ok && number(a.wind_speed)?Math.round(Number(a.wind_speed)):'—';
+          const gust=ok && number(a.wind_gust_speed)?`${Math.round(Number(a.wind_gust_speed))} ${unit}`:'—';
+          const pressure=ok && number(a.pressure)?`${Number(a.pressure).toFixed(a.pressure_unit==='inHg'?2:0)} ${['inHg','hPa','mbar','Pa','kPa','mmHg'].includes(a.pressure_unit)?a.pressure_unit:''}`:'—';
+          const when=Number.isFinite(stamp)?new Date(stamp).toLocaleTimeString('en-US',{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'}):null;
+          const note=stale?'Forecast update delayed · Check Pirate Weather':when?`Pirate Weather · ${when}`:'Pirate Weather · Forecast time unavailable';
+          return `<div class="eyebrow">Local wind / Now</div><div style="display:flex;gap:22px;align-items:center;justify-content:space-between;margin-top:9px"><div><span class="serif" style="font-size:58px;line-height:1">${speed}</span><span class="muted" style="font-size:22px;margin-left:7px">${unit}</span><div style="font-size:15px;margin-top:5px">${bearing!==null?'From '+direction:'Direction unavailable'}</div></div><div style="width:83px;height:83px;border:1px solid #36515c;border-radius:50%;display:grid;place-items:center;position:relative;flex-shrink:0"><span class="muted" style="font-size:9px;position:absolute;top:6px">N</span><ha-icon icon="mdi:arrow-up" style="margin:0;width:32px;height:32px;color:#efd19a;transform:rotate(${bearing??0}deg);opacity:${bearing!==null?1:.2}"></ha-icon></div></div><div class="divider compact-grid"><div><div class="compact-label">Gusts</div><div class="compact-value">${gust}</div></div><div><div class="compact-label">From</div><div class="compact-value">${bearing!==null?Math.round(bearing)+'°':'—'}</div></div><div><div class="compact-label">Pressure</div><div class="compact-value">${pressure}</div></div></div><div style="font-size:10px;color:${stale?'#efd19a':'#91abb5'};margin-top:14px">${note}</div>`;
+
+          ]]]
+      update_timer: 60000
+      tap_action:
+        action: more-info
+        entity: weather.coast_weather
+    column_span: 2
+  - type: grid
+    cards:
+    - grid_options:
+        columns: full
+        rows: auto
+      type: custom:button-card
+      template: coast_panel
+      custom_fields:
+        heading: <div class="eyebrow">Windy / Forecast map</div><div class="serif" style="font-size:24px;margin-top:4px">Wind
+          over the Cape</div>
+        body:
+          card:
+            type: iframe
+            url: https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=in&metricTemp=%C2%B0F&metricWind=mph&zoom=8&overlay=wind&product=ecmwf&level=surface&lat=42.05&lon=-70.18&marker=true
+            aspect_ratio: 70%
+      styles:
+        card:
+        - padding: 20px 12px 12px
+        grid:
+        - grid-template-areas: '"heading" "body"'
+        - row-gap: 14px
+        custom_fields:
+          heading:
+          - text-align: left
+          - white-space: normal
     column_span: 2
