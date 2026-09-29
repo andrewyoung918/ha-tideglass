@@ -1,4 +1,4 @@
-/* Tideglass 0.2.1 • MIT • Bundled, dependency-free Home Assistant card. */
+/* Tideglass 0.2.2 • MIT • Bundled, dependency-free Home Assistant card. */
 (() => {
   const HOUR = 3600000;
   const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -141,7 +141,7 @@
       const note=this.shadowRoot.querySelector('.weather-note');note.textContent=!this._config.weather_entity?'Choose a weather entity to add a forecast.':!available?'Weather unavailable · tide predictions remain visible.':'Weather every 4 hours · temperature / wind / rain chance. Dashes mean no hourly forecast for that time.';
     }
     _updateRange(){const scroller=this.shadowRoot.querySelector('.scroller');if(!scroller||!this._data)return;const time=this._g.start+scroller.scrollLeft/this._g.scale;this.shadowRoot.querySelector('.range').textContent=dateLabel(Math.min(time+1,this._g.end-1),this._data.time_zone);this.shadowRoot.querySelector('[data-action=previous]').disabled=scroller.scrollLeft<2;this.shadowRoot.querySelector('[data-action=next]').disabled=scroller.scrollLeft>=scroller.scrollWidth-scroller.clientWidth-2;}
-    _go(direction){const scroller=this.shadowRoot.querySelector('.scroller'),g=this._g;if(!scroller)return;const starts=this._data.days.map(d=>g.x(stamp(d.start))-g.pad);let left;scroller.classList.toggle('free-position',direction==='today');if(direction==='today')left=Math.max(0,(Date.now()-g.start-4*HOUR)*g.scale);else if(direction==='end')left=scroller.scrollWidth;else if(direction>0)left=starts.find(x=>x>scroller.scrollLeft+4)??scroller.scrollWidth;else left=starts.toReversed().find(x=>x<scroller.scrollLeft-4)??0;scroller.scrollTo({left,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});}
+    _go(direction){const scroller=this.shadowRoot.querySelector('.scroller'),g=this._g;if(!scroller)return;const starts=this._data.days.map(d=>g.x(stamp(d.start))-g.pad);let left;if(direction==='today')left=Math.max(0,(Date.now()-g.start-4*HOUR)*g.scale);else if(direction==='end')left=scroller.scrollWidth;else if(direction>0)left=starts.find(x=>x>scroller.scrollLeft+4)??scroller.scrollWidth;else left=starts.toReversed().find(x=>x<scroller.scrollLeft-4)??0;scroller.classList.add('free-position');scroller.scrollTo({left,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});}
     _bindPointer(scroller){
       let drag=null,moved=false,touchStart=null;
       scroller.addEventListener('wheel',()=>scroller.classList.remove('free-position'),{passive:true});
