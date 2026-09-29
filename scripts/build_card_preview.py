@@ -41,7 +41,7 @@ customElements.define('ha-icon',PreviewIcon);
 <script type="module">
 const d=await(await fetch('/.local/card-preview/data.json')).json();const card=document.querySelector('tideglass-card');let callback,failed=false;
 const forecast=Array.from({length:72},(_,i)=>({datetime:new Date(Date.parse(d.start)+i*3600000).toISOString(),temperature:61+Math.round(5*Math.sin(i/5)),wind_speed:9+i%9,precipitation_probability:i%13===0?42:i%4*5,condition:i%24<6?'clear-night':i%13===0?'rainy':i%4===0?'cloudy':'partlycloudy'}));
-const hass={states:{'weather.demo':{state:'partlycloudy',attributes:{temperature_unit:'°F',wind_speed_unit:'mph'}}},callWS:async()=>{if(failed)throw Error('offline');return d;},connection:{subscribeMessage:async(cb)=>{callback=cb;cb({forecast});return()=>{};}}};
+const hass={states:{'weather.demo':{state:'partlycloudy',attributes:{temperature:63,temperature_unit:'°F',wind_speed_unit:'mph'}}},callWS:async()=>{if(failed)throw Error('offline');return d;},connection:{subscribeMessage:async(cb)=>{callback=cb;cb({forecast});return()=>{};}}};
 card.setConfig({entity:'sensor.provincetown_tideglass_week',weather_entity:'weather.demo'});card.hass=hass;
 document.querySelector('#normal').onclick=()=>{failed=false;d.status='fresh';hass.states['weather.demo'].state='partlycloudy';callback({forecast});card._fetch(true)};
 document.querySelector('#missing').onclick=()=>{hass.states['weather.demo'].state='unavailable';callback({forecast:[]})};

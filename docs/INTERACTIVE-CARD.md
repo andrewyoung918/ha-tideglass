@@ -17,6 +17,8 @@ grid_options:
 
 ## Using the timeline
 
+The header keeps the current tide on the left and current weather on the right, with a condition icon, temperature and condition. It reads the selected weather entity’s current state and updates with Home Assistant; it does not substitute a forecast. Missing current weather is shown as unavailable. This paired row remains side by side on phones.
+
 - Swipe horizontally, scroll with a trackpad, or drag with a mouse. Days use native **proximity** snapping: you can pause between days. Previous/next buttons move to a local midnight; Now returns to the current tide with four hours of context. Initial display also follows the current time.
 - Tap the curve for the local time and height. Focus the timeline and use left/right arrows for days, Home for Now, End for the end, and Enter to inspect the center time. Focus indicators and reduced-motion preferences are respected.
 - Expand Weather to show condition icons, temperature, wind speed, and rain probability every four local hours. The curve and weather use a **single scroll container and time scale**, so swipes keep them aligned. Temperature and wind units come from the selected weather entity.
