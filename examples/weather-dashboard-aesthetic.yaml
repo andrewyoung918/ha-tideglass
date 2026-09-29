@@ -396,23 +396,6 @@ views:
   sections:
   - type: grid
     cards:
-    - type: custom:button-card
-      template: coast_panel
-      grid_options:
-        columns: full
-        rows: auto
-      custom_fields:
-        body: |-
-          <div class="eyebrow">Provincetown / NOAA 8446121</div><div class="serif" style="font-size:29px;line-height:1.2;margin-top:4px">Follow the water.</div>
-      styles:
-        card:
-        - background: transparent
-        - border: '0'
-        - box-shadow: none
-        - padding: 2px 4px 6px
-    column_span: 2
-  - type: grid
-    cards:
     - type: custom:tideglass-card
       entity: sensor.provincetown_tideglass_week
       weather_entity: weather.coast_weather
@@ -439,7 +422,7 @@ views:
           const h = states['sensor.provincetown_tideglass_next_low_height'];
           const heightValid = h && h.state !== '' && !['unknown','unavailable'].includes(h.state) && Number.isFinite(Number(h.state));
           const height = heightValid ? `${Number(h.state).toFixed(2)} ${['ft','m'].includes(h.attributes.unit_of_measurement) ? h.attributes.unit_of_measurement : ''}` : '—';
-          return `<div style="display:flex;justify-content:space-between;align-items:center"><span class="eyebrow" style="color:#73dbc7">Next low</span><ha-icon icon="mdi:arrow-down" style="margin:0;flex-shrink:0;width:21px;height:21px;color:#73dbc7"></ha-icon></div><div class="serif" style="font-size:clamp(26px,4vw,38px);margin-top:19px;white-space:nowrap">${clock}</div><div class="muted" style="font-size:12px;margin-top:5px">${day}</div><div style="margin-top:21px;padding-top:14px;border-top:1px solid #283e4a;color:#73dbc7;font-size:21px">${height}<span class="muted" style="font-size:10px;margin-left:7px">MLLW</span></div>`;
+          return `<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px;color:#73dbc7">Next low</span><ha-icon icon="mdi:arrow-down" style="margin:0;flex-shrink:0;width:21px;height:21px;color:#73dbc7"></ha-icon></div><div class="serif" style="font-size:clamp(24px,3vw,30px);margin-top:10px;white-space:nowrap">${clock}</div><div class="muted" style="font-size:12px;margin-top:5px">${day}</div><div style="margin-top:8px;color:#73dbc7;font-size:16px">${height}</div>`;
           ]]]
       entity: sensor.provincetown_tideglass_next_low_time
       tap_action:
@@ -448,7 +431,7 @@ views:
       - sensor.provincetown_tideglass_next_low_height
       styles:
         card:
-        - padding: 20px
+        - padding: 16px 18px
     - grid_options:
         columns: 6
         rows: auto
@@ -466,7 +449,7 @@ views:
           const h = states['sensor.provincetown_tideglass_next_high_height'];
           const heightValid = h && h.state !== '' && !['unknown','unavailable'].includes(h.state) && Number.isFinite(Number(h.state));
           const height = heightValid ? `${Number(h.state).toFixed(2)} ${['ft','m'].includes(h.attributes.unit_of_measurement) ? h.attributes.unit_of_measurement : ''}` : '—';
-          return `<div style="display:flex;justify-content:space-between;align-items:center"><span class="eyebrow" style="color:#efd19a">Next high</span><ha-icon icon="mdi:arrow-up" style="margin:0;flex-shrink:0;width:21px;height:21px;color:#efd19a"></ha-icon></div><div class="serif" style="font-size:clamp(26px,4vw,38px);margin-top:19px;white-space:nowrap">${clock}</div><div class="muted" style="font-size:12px;margin-top:5px">${day}</div><div style="margin-top:21px;padding-top:14px;border-top:1px solid #283e4a;color:#efd19a;font-size:21px">${height}<span class="muted" style="font-size:10px;margin-left:7px">MLLW</span></div>`;
+          return `<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px;color:#efd19a">Next high</span><ha-icon icon="mdi:arrow-up" style="margin:0;flex-shrink:0;width:21px;height:21px;color:#efd19a"></ha-icon></div><div class="serif" style="font-size:clamp(24px,3vw,30px);margin-top:10px;white-space:nowrap">${clock}</div><div class="muted" style="font-size:12px;margin-top:5px">${day}</div><div style="margin-top:8px;color:#efd19a;font-size:16px">${height}</div>`;
           ]]]
       entity: sensor.provincetown_tideglass_next_high_time
       tap_action:
@@ -475,54 +458,8 @@ views:
       - sensor.provincetown_tideglass_next_high_height
       styles:
         card:
-        - padding: 20px
-  - type: grid
-    cards:
-    - grid_options:
-        columns: full
-        rows: auto
-      type: custom:button-card
-      template: coast_panel
-      custom_fields:
-        body: |-
-          [[[
-          const value = suffix => states['sensor.provincetown_tideglass_'+suffix]?.state;
-          const direction = value('tide_direction');
-          const recent = value('most_recent_tide');
-          const recentTime = value('most_recent_tide_time');
-          const when = recentTime && !Number.isNaN(Date.parse(recentTime)) ? new Date(recentTime).toLocaleTimeString('en-US',{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'}) : '—';
-          const status = value('prediction_status');
-          const h = states['sensor.provincetown_tideglass_predicted_height'];
-          const height = h && h.state !== '' && !['unknown','unavailable'].includes(h.state) && Number.isFinite(Number(h.state)) ? `${Number(h.state).toFixed(2)} ${['ft','m'].includes(h.attributes.unit_of_measurement) ? h.attributes.unit_of_measurement : ''}` : 'unavailable';
-          const directionText = direction === 'rising' ? 'The tide is rising' : direction === 'falling' ? 'The tide is falling' : 'Tide direction unavailable';
-          const recentText = recent === 'low' ? 'Low tide' : recent === 'high' ? 'High tide' : 'Last tide unavailable';
-          const note = status === 'fresh' ? 'NOAA predictions · Updated automatically' : status === 'cached' ? 'Using stored NOAA predictions · Retrying connection' : 'Predictions unavailable · Check Tideglass';
-          return `<div style="display:flex;gap:13px;align-items:center"><ha-icon icon="mdi:waves" style="margin:0;flex-shrink:0;width:30px;height:30px;color:#73dbc7"></ha-icon><div><div style="font-size:15px">${directionText}</div><div class="muted" style="font-size:12px;margin-top:5px">${recentText} at ${when}</div><div class="muted" style="font-size:12px;margin-top:5px">Predicted height ${height}</div></div></div><div style="font-size:11px;color:${status==='fresh'?'#91abb5':'#efd19a'};margin-top:16px;line-height:1.5">${note}</div>`;
-          ]]]
-      entity: sensor.provincetown_tideglass_tide_direction
-      tap_action:
-        action: more-info
-      triggers_update:
-      - sensor.provincetown_tideglass_most_recent_tide
-      - sensor.provincetown_tideglass_most_recent_tide_time
-      - sensor.provincetown_tideglass_prediction_status
-      - sensor.provincetown_tideglass_predicted_height
-    - grid_options:
-        columns: full
-        rows: auto
-      type: custom:button-card
-      template: coast_panel
-      custom_fields:
-        body:
-          card:
-            type: markdown
-            content: |-
-              Tide heights are NOAA predictions relative to **mean lower low water (MLLW)**. Wind and weather can change actual water levels.
-
-              [National Weather Service](https://forecast.weather.gov/MapClick.php?lat=42.05&lon=-70.18) · [NOAA tide table](https://tidesandcurrents.noaa.gov/noaatidepredictions.html?id=8446121)
-      styles:
-        card:
-        - padding: 8px
+        - padding: 16px 18px
+    column_span: 2
   - type: grid
     cards:
     - grid_options:
@@ -535,8 +472,8 @@ views:
           [[[
           const a = entity?.attributes || {};
           const valid = entity && !['unknown','unavailable'].includes(entity.state) && Array.isArray(a.tides);
-          const title = '<div class="eyebrow">Seven days of tides</div><div class="serif" style="font-size:28px;margin:5px 0 24px">Plan around the water</div>';
-          if (!valid) return title + '<div class="muted">Tide predictions are unavailable. Tideglass will retry automatically.</div>';
+          const title = '<h2 class="serif" style="font-size:24px;margin:0 0 16px">Tide table</h2>';
+          if (!valid) return title + '<div class="muted">Predictions unavailable · retrying automatically.</div>';
           const tz = {timeZone:'America/New_York'};
           const unit = ['ft','m'].includes(a.height_unit) ? a.height_unit : '';
           const groups = new Map();
@@ -554,10 +491,10 @@ views:
               const h = t.height !== null && t.height !== '' && Number.isFinite(Number(t.height)) ? `${Number(t.height).toFixed(2)} ${unit}` : 'Height unavailable';
               return `<div style="display:flex;justify-content:space-between;gap:6px;align-items:baseline;margin-top:7px;flex-wrap:wrap"><span style="font-size:14px;white-space:nowrap">${time}</span><span class="muted" style="font-size:11px;white-space:nowrap">${h}</span></div>`;
             }).join('');
-            return `<div><div style="color:${color};font-size:10px;letter-spacing:1.7px;text-transform:uppercase">${kind === 'low' ? '↓ Low' : '↑ High'}</div>${items || '<div class="muted" style="margin-top:7px">—</div>'}</div>`;
+            return `<div><div style="color:${color};font-size:12px">${kind === 'low' ? '↓ Low' : '↑ High'}</div>${items || '<div class="muted" style="margin-top:7px">—</div>'}</div>`;
           };
           const rows = [...groups.values()].map(day => `<div class="week-row"><div><div style="font-size:16px">${day.date.toLocaleDateString('en-US',{...tz,weekday:'long'})}</div><div class="muted" style="font-size:11px;margin-top:5px">${day.date.toLocaleDateString('en-US',{...tz,month:'short',day:'numeric'})}</div></div><div class="week-tides">${cell(day.low,'low')}${cell(day.high,'high')}</div></div>`).join('');
-          return title + (rows || '<div class="muted">No tide events are available for this week.</div>') + '<div class="muted" style="font-size:11px;margin-top:18px">Provincetown local time · Heights above MLLW · Tap for the full data</div>';
+          return title + (rows || '<div class="muted">No tide events are available for this week.</div>') + '<div class="muted" style="font-size:11px;margin-top:18px">Provincetown time · Heights above MLLW</div>';
           ]]]
       entity: sensor.provincetown_tideglass_week
       tap_action:
@@ -570,9 +507,9 @@ views:
         .metric { display: flex; align-items: center; gap: 7px; font-size: 13px; color: #b9cdd2; }
         .metric ha-icon { margin: 0; flex-shrink: 0; width: 16px; height: 16px; color: #73dbc7; }
 
-        .week-row {display:grid;grid-template-columns:125px minmax(0,1fr);gap:18px;padding:20px 0;border-top:1px solid #283e4a;}
+        .week-row {display:grid;grid-template-columns:125px minmax(0,1fr);gap:18px;padding:14px 0;border-top:1px solid #283e4a;}
         .week-tides {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;}
-        @media(max-width:600px) {.week-row {grid-template-columns:1fr;gap:15px;}.week-tides {gap:18px;}}
+        @media(max-width:600px) {.week-row {grid-template-columns:1fr;gap:9px;}.week-tides {gap:18px;}}
     column_span: 2
 - title: Wind
   path: wind
