@@ -26,6 +26,10 @@ Times are stored as timezone-aware UTC timestamps and displayed in Home Assistan
 
 High/low sensors use NOAA’s actual high/low prediction product. Harmonic stations use NOAA’s six-minute curve. Subordinate stations get an explicitly labeled illustrative curve between the official extrema; their current-height sensor is unavailable because a high/low table does not provide a continuous prediction.
 
+## Interactive tide card
+
+Version 0.2.0 includes a bundled **Tideglass** dashboard card: swipe through seven days with gentle day snapping, sunrise/sunset markers, subtle nighttime shading and tap-to-inspect tide heights. Expand Weather for aligned four-hour condition icons, temperature, wind and rain probability. It scales to phones, tablets and desktops, supports keyboard navigation, and uses any HA weather entity with hourly forecasts. [Card setup and behavior](docs/INTERACTIVE-CARD.md).
+
 ## A dashboard for the coast
 
 [`examples/weather-dashboard-aesthetic.yaml`](examples/weather-dashboard-aesthetic.yaml) is the styled Coast dashboard: Tideglass’s navy, seafoam and gold palette, Pirate Weather current conditions, next-hour rain guidance, a six-hour outlook, a five-day forecast, full-width tide curves, explicit high/low times and heights, radar, wind, and a readable seven-day tide table. It uses the HACS **button-card** and **clock-weather-card** frontend cards. Pirate Weather is a separate optional integration and needs its own API key; Tideglass itself remains key-free. Colors stay scoped to the dashboard; no global theme change is needed. See the [styled dashboard guide](docs/DASHBOARD.md).
