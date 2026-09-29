@@ -25,3 +25,12 @@ Verified September 28, 2026 local / September 29 UTC, on Home Assistant 2026.9.3
 Keyboard navigation and responsive layout were exercised in the browser preview. Physical phone touch gestures, forced live provider outages, long-term operation, other stations and live DST rollover were not tested on the household. Their relevant data behavior has automated coverage. No household devices were actuated as test probes.
 
 The installation preserved the existing managed house YAML and unrelated work. Coast layout changes were handled by its coordinated task through the supported dashboard editor. Recovery snapshots and exact hashes are retained privately outside Git; the preceding release can be restored through HACS.
+
+## Current weather header, v0.2.3
+
+Candidate `472ec2d0523fd6dda20d5c7b6095f77c31ab9e76` pairs the current tide at left with current condition icon, temperature and label at right. It uses current weather entity state and updates with HA state changes; forecast subscription failure does not hide valid current conditions.
+
+- Preview checked at 1280, 390 and 320 pixels. The tide and temperature bounding boxes had identical vertical positions. At 390/320, document width equaled viewport width. Unavailable current weather displayed a dash and explicit label; expansion remained usable. Preview readings were simulated.
+- HACS installation completed September 29 around03:15UTC; baseline and immediate post-install HA UI configuration checks passed. All18 live component files exactly match the candidate. Browser refresh activated this frontend-only update; no backend change or Core restart.
+- Live Coast displayed a rising7.1ft tide and rainy62°F weather side by side. No Tideglass browser errors were captured. User's open Coast tab was refreshed. Five existing JS tests, syntax, Ruff and diff checks passed locally; release Test and HACS/hassfest CI passed.
+- Stable tag `stable/20260929T031702Z` records this scoped frontend verification. Exact preceding two-file snapshot and final hashes remain outside Git in `.local/backups/0.2.2-before-current-weather-header/`. Recovery is HACS v0.2.2, configuration check, then browser refresh. Physical phone hardware and long-term operation were not tested for this small update.
