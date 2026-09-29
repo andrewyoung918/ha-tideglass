@@ -1,4 +1,4 @@
-/* Tideglass 0.2.3 • MIT • Bundled, dependency-free Home Assistant card. */
+/* Tideglass 0.2.4 • MIT • Bundled, dependency-free Home Assistant card. */
 (() => {
   const HOUR = 3600000;
   const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -118,8 +118,8 @@
       }
       for(const h of [g.min,(g.min+g.max)/2,g.max])grid+=`<line class="grid" x1="${g.pad}" x2="${g.width-g.pad}" y1="${g.y(h)}" y2="${g.y(h)}"/>`;
       const segments=[];let segment=[];
-      for(const sample of d.samples){if(segment.length&&sample[0]-segment.at(-1)[0]>7*60000){segments.push(segment);segment=[];}segment.push(sample);}if(segment.length)segments.push(segment);
-      const paths=segments.map(segment=>{const line=segment.map((s,i)=>`${i?'L':'M'}${g.x(s[0]).toFixed(2)},${g.y(s[1]).toFixed(2)}`).join(' ');return `<path d="${line} L${g.x(segment.at(-1)[0])},247 L${g.x(segment[0][0])},247 Z" fill="url(#water)"/><path class="curve" d="${line}"/>`;}).join('');
+      for(const sample of d.samples){if(segment.length&&sample[0]-segment[segment.length-1][0]>7*60000){segments.push(segment);segment=[];}segment.push(sample);}if(segment.length)segments.push(segment);
+      const paths=segments.map(segment=>{const line=segment.map((s,i)=>`${i?'L':'M'}${g.x(s[0]).toFixed(2)},${g.y(s[1]).toFixed(2)}`).join(' ');return `<path d="${line} L${g.x(segment[segment.length-1][0])},247 L${g.x(segment[0][0])},247 Z" fill="url(#water)"/><path class="curve" d="${line}"/>`;}).join('');
       for(const e of d.events){const x=g.x(stamp(e.time)),y=g.y(e.height),high=e.type==='high',labelY=y+(high?-27:22);events+=`<circle cx="${x}" cy="${y}" r="3" fill="${high?'#efd19a':'#73dbc7'}" stroke="#101f2b" stroke-width="2"/><text class="event-label" x="${x}" y="${labelY}" text-anchor="middle">${high?'High':'Low'} · ${Number(e.height).toFixed(1)} ${escape(d.unit)}</text><text class="event-time" x="${x}" y="${labelY+14}" text-anchor="middle">${clock(stamp(e.time),d.time_zone,true)}</text>`;}
       return `<svg class="chart" width="${g.width}" height="282" viewBox="0 0 ${g.width} 282" role="img" aria-label="Tide curve with high and low tides, sunrise, sunset and nighttime shading"><defs><linearGradient id="water" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#73dbc7" stop-opacity=".16"/><stop offset="1" stop-color="#73dbc7" stop-opacity=".01"/></linearGradient></defs>${background}${grid}${solar}${paths}${events}<g class="now-marker"></g><g class="inspection"></g></svg>`;
     }
@@ -153,7 +153,7 @@
       const note=this.shadowRoot.querySelector('.weather-note');note.textContent=!this._config.weather_entity?'Choose a weather entity to add a forecast.':!available?'Weather unavailable · tide predictions remain visible.':'Weather every 4 hours · temperature / wind / rain chance. Dashes mean no hourly forecast for that time.';
     }
     _updateRange(){const scroller=this.shadowRoot.querySelector('.scroller');if(!scroller||!this._data)return;const time=this._g.start+scroller.scrollLeft/this._g.scale;this.shadowRoot.querySelector('.range').textContent=dateLabel(Math.min(time+1,this._g.end-1),this._data.time_zone);this.shadowRoot.querySelector('[data-action=previous]').disabled=scroller.scrollLeft<2;this.shadowRoot.querySelector('[data-action=next]').disabled=scroller.scrollLeft>=scroller.scrollWidth-scroller.clientWidth-2;}
-    _go(direction){const scroller=this.shadowRoot.querySelector('.scroller'),g=this._g;if(!scroller)return;const starts=this._data.days.map(d=>g.x(stamp(d.start))-g.pad);let left;if(direction==='today')left=Math.max(0,(Date.now()-g.start-4*HOUR)*g.scale);else if(direction==='end')left=scroller.scrollWidth;else if(direction>0)left=starts.find(x=>x>scroller.scrollLeft+4)??scroller.scrollWidth;else left=starts.toReversed().find(x=>x<scroller.scrollLeft-4)??0;scroller.classList.add('free-position');scroller.scrollTo({left,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});}
+    _go(direction){const scroller=this.shadowRoot.querySelector('.scroller'),g=this._g;if(!scroller)return;const starts=this._data.days.map(d=>g.x(stamp(d.start))-g.pad);let left;if(direction==='today')left=Math.max(0,(Date.now()-g.start-4*HOUR)*g.scale);else if(direction==='end')left=scroller.scrollWidth;else if(direction>0)left=starts.find(x=>x>scroller.scrollLeft+4)??scroller.scrollWidth;else left=starts.slice().reverse().find(x=>x<scroller.scrollLeft-4)??0;scroller.classList.add('free-position');scroller.scrollTo({left,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});}
     _bindPointer(scroller){
       let drag=null,moved=false,touchStart=null;
       scroller.addEventListener('wheel',()=>scroller.classList.remove('free-position'),{passive:true});
